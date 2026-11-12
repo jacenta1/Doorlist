@@ -1,0 +1,154 @@
+package templates
+
+import "doorlist/internal/event"
+
+templ Home(site Site, events []*event.View) {
+	@Page(site, "Doorlist · show up, get paid", "RSVP with a small deposit. Show up and get it back plus a share of the no-shows.") {
+		<section class="hero">
+			<h1 class="display">Show up.</h1>
+			<p class="lede">RSVP with a small deposit from any chain. Check in at the door and get it back, plus an equal share of every deposit from people who didn't come.</p>
+		</section>
+		if len(events) == 0 {
+			<section class="empty">
+				<p class="display sm">No events yet.</p>
+				<p>Hosts create events from <a href="/host">the host page</a>.</p>
+			</section>
+		} else {
+			<section class="list" aria-label="Events">
+				for _, v := range events {
+					<a class="row" href={ templ.SafeURL("/e/" + v.Ev.ID) }>
+						<div class="row-cover">
+							@templ.Raw(CoverSVG(v.Meta.Cover, v.Meta.Title))
+						</div>
+						<div class="row-body">
+							<span class={ "chip", templ.KV("chip-hot", v.Phase == event.PhaseDoors) }>{ phaseLabel(v.Phase) }</span>
+							<h2>{ v.Meta.Title }</h2>
+							<p class="meta">{ longDate(v.Starts) } · { clock(v.Starts) } · { v.Meta.City }</p>
+							<p class="meta">{ usdc(v.Ev.Deposit) } USDC deposit · { itoa(v.Going) } going</p>
+						</div>
+					</a>
+				}
+			</section>
+		}
+		<section class="how" aria-label="How it works">
+			<div><b>01</b><h3>RSVP</h3><p>Scan the event QR. Pay the deposit from Base, Arbitrum, Solana, Ethereum, Bitcoin or NEAR. No NEAR wallet needed.</p></div>
+			<div><b>02</b><h3>Show up</h3><p>Show your ticket at the door. The host's phone scans it and signs your check-in.</p></div>
+			<div><b>03</b><h3>Get paid</h3><p>When the host closes the event, the pot's DAO pays everyone who came: deposit back plus a share of the no-shows.</p></div>
+		</section>
+	}
+}
+
+templ EventPage(site Site, v *event.View) {
+	@Page(site, v.Meta.Title+" · Doorlist", "Deposit "+usdc(v.Ev.Deposit)+" USDC to RSVP. Show up and get it back plus a share of the no-shows.") {
+		<article class="ev">
+			<aside class="ev-left">
+				<div class="cover">
+					@templ.Raw(CoverSVG(v.Meta.Cover, v.Meta.Title))
+				</div>
+				<p class="label">Hosted by</p>
+				<ul class="hosts">
+					for _, h := range v.Meta.Hosts {
+						<li><span class="face">{ event.Initials(h.Name) }</span><span><b>{ h.Name }</b><small>{ h.Account }</small></span></li>
+					}
+				</ul>
+				if v.Going > 0 {
+					<p class="label">{ itoa(v.Going) } going</p>
+					@Avatars(v.Guests, 9)
+				}
+			</aside>
+			<div class="ev-right">
+				if v.Meta.City != "" {
+					<span class="chip">
+						if v.Meta.Featured {
+							Featured in { v.Meta.City }
+						} else {
+							{ v.Meta.City }
+						}
+					</span>
+				}
+				<h1 class="title">{ v.Meta.Title }</h1>
+				<div class="tiles">
+					<div class="tile">
+						<span class="tile-ico date"><small>{ month(v.Starts) }</small>{ day(v.Starts) }</span>
+						<span><b>{ longDate(v.Starts) }</b><small>{ timeRange(v.Starts, v.Closes) }</small></span>
+					</div>
+					<div class="tile">
+						<span class="tile-ico">
+							@IconPin()
+						</span>
+						<span><b>{ v.Meta.Venue }</b><small>{ v.Meta.Area }{ ", " + v.Meta.City }</small></span>
+					</div>
+				</div>
+				@DepositCard(v)
+				if len(v.Meta.About) > 0 {
+					<section class="block">
+						<h2 class="label">About event</h2>
+						for _, p := range v.Meta.About {
+							<p>{ p }</p>
+						}
+					</section>
+				}
+				@PotBlock(v)
+			</div>
+		</article>
+	}
+}
+
+templ DepositCard(v *event.View) {
+	<section class="card dep" aria-label="Deposit">
+		switch v.Phase {
+			case event.PhaseClosed:
+				<p class="card-h">Settled</p>
+				<p class="shout-line">{ itoa(v.Shows) } showed up. { itoa(v.Going - v.Shows) } didn't.</p>
+				<div class="opt"><span>Each person who came got</span><b>{ usdc(v.Split.PayoutPerShow) } USDC</b></div>
+				<p class="fine">{ usdc(v.Ev.Deposit) } back plus { usdcx(v.Split.SharePerShow) } from the no-shows, paid by the DAO.</p>
+			case event.PhaseCancelled:
+				<p class="card-h">Cancelled by the host</p>
+				<p class="fine">Every deposit is being refunded in full.</p>
+			case event.PhaseDoors, event.PhaseEnded:
+				<p class="card-h">RSVPs are closed · doors open</p>
+				<div class="opt"><span>{ usdc(v.Ev.Deposit) } USDC · any chain</span><span>{ itoa(v.Shows) } of { itoa(v.Going) } in</span></div>
+				<div class="meter" role="img" aria-label={ itoa(v.Shows) + " of " + itoa(v.Going) + " checked in" }><i style={ "width:" + itoa(pct(v.Shows, v.Going)) + "%" }></i></div>
+				<p class="fine">Got a ticket? Open it and show the QR at the door.</p>
+			default:
+				<p class="card-h">Deposit to RSVP · refunded when you check in</p>
+				<div class="opt"><span>{ usdc(v.Ev.Deposit) } USDC · any chain</span><span>{ itoa(v.Going) } going</span></div>
+				if v.SpotsLeft <= 0 {
+					<button class="btn" disabled>Full</button>
+				} else {
+					<a class="btn" href={ templ.SafeURL("/e/" + v.Ev.ID + "/rsvp") }>Deposit &amp; RSVP</a>
+				}
+				if v.Phase == event.PhasePriority {
+					<p class="fine"><b>Regulars first.</b> Until { stamp(v.Public) }, only people with { u32(v.Ev.PriorityMinShows) }+ past check-ins can RSVP.</p>
+				} else {
+					<p class="fine">Show up: get it back plus a share of the no-shows. Flake: it goes to the people who came. { itoa(v.SpotsLeft) } spots left.</p>
+				}
+		}
+	</section>
+}
+
+templ PotBlock(v *event.View) {
+	<section class="block">
+		<h2 class="label">The pot</h2>
+		<div class="stats">
+			<div><b>{ usdc(v.Ev.Pot) }</b><small>USDC deposited</small></div>
+			<div><b>{ itoa(v.Going) }</b><small>going</small></div>
+			<div><b>{ itoa(v.Shows) }</b><small>checked in</small></div>
+		</div>
+		if v.Phase != event.PhaseClosed && v.Going > 0 {
+			<table class="proj">
+				<caption>If people flake, everyone who comes gets</caption>
+				<tbody>
+					for _, o := range v.Outlooks {
+						<tr><th scope="row">{ itoa(o.FlakeRate) }% flake</th><td>{ o.BonusText } USDC each</td></tr>
+					}
+				</tbody>
+			</table>
+		}
+		<p class="fine">Held by <code>{ v.Ev.DAO }</code>, a Sputnik DAO. The Doorlist contract can only file and approve payout transfers that match the check-in list; the hosts' council can see and veto every one.
+			if v.Treasury.Simulated {
+				<em> (Simulated in demo mode.)</em>
+			}
+		</p>
+	</section>
+}

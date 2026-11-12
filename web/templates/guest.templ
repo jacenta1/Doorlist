@@ -1,0 +1,203 @@
+package templates
+
+import (
+	"doorlist/contract/core"
+	"doorlist/internal/event"
+	"doorlist/internal/intents"
+)
+
+templ RSVPPage(site Site, v *event.View, form event.RSVPInput, errMsg string) {
+	@Page(site, "RSVP · "+v.Meta.Title, "Deposit to RSVP for "+v.Meta.Title) {
+		<section class="narrow">
+			<a class="back" href={ templ.SafeURL("/e/" + v.Ev.ID) }>← { v.Meta.Title }</a>
+			<h1 class="title">RSVP</h1>
+			<p class="lede sm">Deposit { usdc(v.Ev.Deposit) } USDC from any chain. Check in at the door and it comes back with a share of the no-shows.</p>
+			<div id="rsvp">
+				@RSVPForm(v, form, errMsg)
+			</div>
+		</section>
+	}
+}
+
+templ RSVPForm(v *event.View, form event.RSVPInput, errMsg string) {
+	<form class="card form" hx-post={ "/e/" + v.Ev.ID + "/rsvp" } hx-target="#rsvp" hx-swap="innerHTML" method="post" action={ templ.SafeURL("/e/" + v.Ev.ID + "/rsvp") }>
+		if errMsg != "" {
+			<p class="err" role="alert">{ errMsg }</p>
+		}
+		<label for="name">Your name <small>The host sees this on the door list. It is never written on chain.</small></label>
+		<input id="name" name="name" autocomplete="name" maxlength="40" required value={ form.Name }/>
+		<fieldset>
+			<legend>Pay with</legend>
+			<div class="origins">
+				for _, o := range intents.Origins {
+					<label class="origin">
+						<input type="radio" name="origin" value={ o.ID } required checked?={ form.Origin == o.ID || (form.Origin == "" && o.ID == "usdc-base") }/>
+						<span><b>{ o.Symbol }</b><small>{ o.ChainName }</small></span>
+					</label>
+				}
+				<label class="origin">
+					<input type="radio" name="origin" value="near" checked?={ form.Origin == "near" }/>
+					<span><b>USDC</b><small>NEAR account</small></span>
+				</label>
+			</div>
+		</fieldset>
+		<label for="address">Your address on that chain <small>Refunds and your payout come back here.</small></label>
+		<input id="address" name="address" autocomplete="off" spellcheck="false" required value={ form.Address } placeholder="0x…, a Solana or Bitcoin address, or name.near"/>
+		<button class="btn" type="submit">
+			Get my deposit address
+			<span class="htmx-indicator spin" aria-hidden="true"></span>
+		</button>
+		<p class="fine">Quotes come from NEAR Intents 1Click: whatever you send settles as exactly { usdc(v.Ev.Deposit) } USDC on NEAR.</p>
+	</form>
+}
+
+templ QuoteCard(site Site, v *event.View, g *event.Guest, ticketURL string) {
+	<section class="card quote" aria-live="polite">
+		if g.Quote != nil {
+			<p class="card-h">Send exactly</p>
+			<p class="amount">{ g.Quote.Quote.AmountInFormatted } <span>{ originLabel(g.Origin) }</span></p>
+			if g.Quote.Quote.DepositAddress != "" {
+				<p class="card-h">to this deposit address</p>
+				<p class="addr"><code>{ g.Quote.Quote.DepositAddress }</code></p>
+			} else {
+				<p class="fine tag">Dry-run quote (dry: true). In demo mode 1Click prices the swap but issues no deposit address.</p>
+			}
+			<dl class="kv">
+				<dt>Arrives as</dt><dd>{ usdc(v.Ev.Deposit) } USDC on NEAR</dd>
+				<dt>About</dt><dd>{ itoa(g.Quote.Quote.TimeEstimate) } seconds</dd>
+				<dt>Refunds to</dt><dd><code>{ short(g.Address) }</code></dd>
+				if g.Quote.Offline {
+					<dt>Source</dt><dd>Offline estimate: 1Click was unreachable</dd>
+				} else {
+					<dt>Quote id</dt><dd><code>{ short(g.Quote.CorrelationID) }</code></dd>
+				}
+			</dl>
+		} else {
+			<p class="card-h">Deposit from your NEAR wallet</p>
+			<p class="fine">Send { usdc(v.Ev.Deposit) } USDC with <code>ft_transfer_call</code> to the Doorlist contract, with <code>{ `{"event":"` + v.Ev.ID + `","ticket":"` + g.Ticket + `"}` }</code> as msg.</p>
+		}
+		if site.Demo {
+			<form hx-post={ "/t/" + g.Ticket + "/simulate" } hx-target="#rsvp">
+				<button class="btn" type="submit">Simulate the deposit (demo)</button>
+			</form>
+		}
+		<a class="link" href={ templ.SafeURL(ticketURL) }>Open my ticket →</a>
+		<p class="fine">Keep the ticket link. It's how you get in.</p>
+	</section>
+}
+
+templ TicketPage(site Site, t *event.TicketView) {
+	@Page(site, "Ticket · "+t.Event.Meta.Title, "Your Doorlist ticket") {
+		<section class="narrow ticket">
+			<div hx-get={ "/t/" + t.Event.Ev.ID + "/" + t.Guest.Ticket + "/status" } hx-trigger={ pollTrigger(t) } hx-swap="outerHTML" id="tstatus">
+				@TicketStatus(t)
+			</div>
+		</section>
+	}
+}
+
+func pollTrigger(t *event.TicketView) string {
+	if t.RSVP != nil && (t.RSVP.PayStatus == core.PayPaid || t.RSVP.PayStatus == core.PayForfeit) {
+		return "none"
+	}
+	return "every 4s"
+}
+
+templ TicketStatus(t *event.TicketView) {
+	<div id="tstatus" hx-get={ "/t/" + t.Event.Ev.ID + "/" + t.Guest.Ticket + "/status" } hx-trigger={ pollTrigger(t) } hx-swap="outerHTML">
+		if t.RSVP == nil {
+			if t.Guest.Status == event.GuestRejected {
+				<h1 class="display md">Deposit bounced.</h1>
+				<p class="lede sm">{ t.Guest.Error }. The token contract refunds it automatically.</p>
+			} else {
+				<h1 class="display md">Waiting for your deposit.</h1>
+				<p class="lede sm">As soon as it settles on NEAR you're on the list. This page updates by itself.</p>
+			}
+		} else if t.RSVP.PayStatus == core.PayPaid {
+			<h1 class="display xl shout">You showed up. <span>+{ usdc(t.RSVP.Payout - t.RSVP.Deposit) } USDC</span></h1>
+		} else if t.RSVP.PayStatus == core.PayForfeit {
+			<h1 class="display md">You didn't make it.</h1>
+			<p class="lede sm">Your { usdc(t.RSVP.Deposit) } USDC went to the { itoa(t.Event.Shows) } people who came. Next time.</p>
+		} else if t.RSVP.CheckedInAt != 0 {
+			<h1 class="display md">You're in.</h1>
+			<p class="lede sm">Checked in at { clock(ms(t.RSVP.CheckedInAt)) }. Your deposit comes back when the host closes the event.</p>
+		} else {
+			<h1 class="display md">You're on the list.</h1>
+		}
+		<div class="pass">
+			<div class="pass-top">
+				<span class="mark sm">DOORLIST</span>
+				<span>{ t.Guest.Name }</span>
+			</div>
+			<h2>{ t.Event.Meta.Title }</h2>
+			<p class="meta">{ longDate(t.Event.Starts) } · { clock(t.Event.Starts) } · { t.Event.Meta.Venue }, { t.Event.Meta.City }</p>
+			if t.RSVP != nil && t.RSVP.PayStatus == "" {
+				<div class="qr">
+					@templ.Raw(QRSVG(t.URL, "Ticket QR code"))
+				</div>
+				<p class="code" aria-label="Short code">{ t.Short }</p>
+				<p class="fine center">Show this at the door. If the camera fails, read out the code.</p>
+			}
+		</div>
+		@MoneyStages(t)
+		<p class="fine">
+			if t.Shows == 1 {
+				You've shown up once.
+			} else {
+				You've shown up { u32(t.Shows) } times.
+			}
+			Regulars get early RSVPs at events that ask for them.
+		</p>
+		if t.RSVP != nil && t.RSVP.PayStatus == core.PayPaid {
+			@Receipt(t)
+		}
+	</div>
+}
+
+templ MoneyStages(t *event.TicketView) {
+	<ol class="stages" aria-label="Where your money is">
+		<li class={ stageClass(t, 0) }><b>Deposited</b><small>
+			if t.RSVP != nil {
+				{ usdc(t.RSVP.Deposit) } USDC in the pot
+			} else {
+				waiting
+			}
+		</small></li>
+		<li class={ stageClass(t, 1) }><b>Checked in</b><small>
+			if t.RSVP != nil && t.RSVP.CheckedInAt != 0 {
+				{ clock(ms(t.RSVP.CheckedInAt)) }, door-signed
+			} else if t.RSVP != nil && t.RSVP.PayStatus == core.PayForfeit {
+				no-show
+			} else {
+				doors { clock(t.Event.Doors) }
+			}
+		</small></li>
+		<li class={ stageClass(t, 2) }><b>Refunded + share</b><small>
+			if t.RSVP != nil && t.RSVP.Payout > 0 {
+				{ usdc(t.RSVP.Payout) } USDC
+			} else {
+				after close
+			}
+		</small></li>
+	</ol>
+}
+
+templ Receipt(t *event.TicketView) {
+	<section class="card receipt" aria-label="Payout receipt">
+		<p class="card-h">Payout receipt</p>
+		<dl class="kv">
+			<dt>Deposit back</dt><dd>{ usdcx(t.RSVP.Deposit) } USDC</dd>
+			<dt>Share of no-shows</dt><dd>{ usdcx(t.RSVP.Payout - t.RSVP.Deposit) } USDC</dd>
+			<dt>Total</dt><dd><b>{ usdcx(t.RSVP.Payout) } USDC</b></dd>
+			<dt>Paid to</dt><dd><code>{ short(t.RSVP.PayTo) }</code></dd>
+			<dt>From DAO</dt><dd><code>{ t.Event.Ev.DAO }</code></dd>
+			if t.RSVP.ProposalID != nil {
+				<dt>Proposal</dt><dd>#{ u64(*t.RSVP.ProposalID) } · Transfer · approved</dd>
+			}
+			<dt>Split</dt><dd>{ itoa(t.Event.Shows) } of { itoa(t.Event.Going) } came; { usdcx(t.Event.Split.Dust) } USDC rounding stays in the DAO</dd>
+		</dl>
+		if t.RSVP.PayTo != t.Guest.Identity && t.Guest.Origin != "near" {
+			<p class="fine">You paid from { originLabel(t.Guest.Origin) }, so the relayer's outbox forwards this to <code>{ short(t.Guest.Address) }</code> through 1Click.</p>
+		}
+	</section>
+}

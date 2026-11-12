@@ -548,3 +548,16 @@ func Slug(s string) string {
 }
 
 func strconvU(v uint64) string { return pot.Itoa(v) }
+
+// PendingDeposits lists guests with a live deposit address not yet settled.
+func (s *Service) PendingDeposits() []*Guest {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := []*Guest{}
+	for _, g := range s.guests {
+		if g.Status == GuestQuoted && g.Quote != nil && g.Quote.Quote.DepositAddress != "" {
+			out = append(out, g)
+		}
+	}
+	return out
+}

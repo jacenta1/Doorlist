@@ -1,0 +1,156 @@
+package templates
+
+import (
+	"doorlist/internal/event"
+	"time"
+)
+
+templ HostSignIn(site Site, nonceB64 string, recipient string, errMsg string) {
+	@Page(site, "Host · Doorlist", "Sign in to host an event") {
+		<section class="narrow">
+			<h1 class="display md">Host a night people show up to.</h1>
+			<p class="lede sm">Set a deposit, share the QR, scan people in at the door. When you close the event, the pot's DAO pays everyone who came.</p>
+			if errMsg != "" {
+				<p class="err" role="alert">{ errMsg }</p>
+			}
+			<div class="card form">
+				if site.Demo {
+					<form method="post" action="/host/demo">
+						<button class="btn" type="submit">Continue as demo host</button>
+					</form>
+					<p class="fine">Signs you in as <code>demo-host.testnet</code>, host of the seeded events. Nothing is signed for real in demo mode.</p>
+				} else {
+					<button class="btn" id="signin" type="button" data-nonce={ nonceB64 } data-recipient={ recipient } data-network={ site.Network }>Sign in with Meteor Wallet</button>
+					<p class="fine" id="signin-status">Signs a NEP-413 message: no transaction, no fee. Other NEAR wallets work too.</p>
+					<script type="module" src="/static/host.js"></script>
+				}
+			</div>
+		</section>
+	}
+}
+
+templ HostHome(site Site, events []*event.View, errMsg string, defaultStart time.Time) {
+	@Page(site, "Your events · Doorlist", "Host dashboard") {
+		<section class="wide">
+			<div class="head-row">
+				<h1 class="title">Your events</h1>
+				<form method="post" action="/host/signout"><button class="ghost" type="submit">Sign out</button></form>
+			</div>
+			if len(events) == 0 {
+				<p class="empty-inline">No events yet. Create the first one below.</p>
+			}
+			<div class="list">
+				for _, v := range events {
+					<a class="row" href={ templ.SafeURL("/host/e/" + v.Ev.ID) }>
+						<div class="row-cover">
+							@templ.Raw(CoverSVG(v.Meta.Cover, v.Meta.Title))
+						</div>
+						<div class="row-body">
+							<span class={ "chip", templ.KV("chip-hot", v.Phase == event.PhaseDoors) }>{ phaseLabel(v.Phase) }</span>
+							<h2>{ v.Meta.Title }</h2>
+							<p class="meta">{ longDate(v.Starts) } · { itoa(v.Going) } going · { itoa(v.Shows) } in</p>
+						</div>
+					</a>
+				}
+			</div>
+			<h2 class="title sm" id="new">New event</h2>
+			if errMsg != "" {
+				<p class="err" role="alert">{ errMsg }</p>
+			}
+			<form class="card form grid2" method="post" action="/host/events">
+				<label class="span2">Title<input name="title" required maxlength="80" placeholder="Builders Night"/></label>
+				<label>City<input name="city" placeholder="Lisbon"/></label>
+				<label>Venue<input name="venue" placeholder="Armazém 16"/></label>
+				<label>Starts<input type="datetime-local" name="starts" required value={ defaultStart.Format("2006-01-02T15:04") }/></label>
+				<label>Check-in open for (hours)<input type="number" name="hours" min="1" max="12" value="3"/></label>
+				<label>Deposit (USDC)<input name="deposit" inputmode="decimal" value="10" required/></label>
+				<label>Capacity<input type="number" name="capacity" min="1" max="2000" value="40" required/></label>
+				<label>Regulars' head start (hours)<input type="number" name="priority_hours" min="0" max="168" value="24"/></label>
+				<label>Check-ins needed to count as a regular<input type="number" name="priority_min" min="0" max="50" value="1"/></label>
+				<label class="span2">Sputnik DAO that holds the pot<input name="dao" required placeholder="your-community.sputnik-dao.near" value={ defaultDAO(site) }/></label>
+				<label class="span2">About<textarea name="about" rows="4" placeholder="What happens, who it's for. Blank line between paragraphs."></textarea></label>
+				<button class="btn span2" type="submit">Create event</button>
+			</form>
+		</section>
+	}
+}
+
+templ HostEvent(site Site, v *event.View, doorURL string, msg string) {
+	@Page(site, "Host · "+v.Meta.Title, "Host dashboard") {
+		<section class="wide">
+			<a class="back" href="/host">← Your events</a>
+			<div class="head-row">
+				<h1 class="title">{ v.Meta.Title }</h1>
+				<span class={ "chip", templ.KV("chip-hot", v.Phase == event.PhaseDoors) }>{ phaseLabel(v.Phase) }</span>
+			</div>
+			if msg != "" {
+				<p class="ok" role="status">{ msg }</p>
+			}
+			<div class="stats big">
+				<div><b>{ itoa(v.Going) }</b><small>going</small></div>
+				<div><b>{ itoa(v.Shows) }</b><small>checked in</small></div>
+				<div><b>{ usdc(v.Ev.Pot) }</b><small>USDC in the pot</small></div>
+				<div><b>{ "+" + usdc(v.Split.SharePerShow) }</b><small>each, if it closed now</small></div>
+			</div>
+			<div class="actions">
+				if v.Phase != event.PhaseClosed && v.Phase != event.PhaseCancelled {
+					<a class="btn" href={ templ.SafeURL("/door/" + v.Ev.ID) }>Open the door scanner</a>
+					if site.Demo && v.Phase == event.PhaseDoors {
+						<form method="post" action={ templ.SafeURL("/host/e/" + v.Ev.ID + "/arrive") }><button class="btn ghost" type="submit">Simulate an arrival</button></form>
+					}
+					<form method="post" action={ templ.SafeURL("/host/e/" + v.Ev.ID + "/close") } onsubmit="return confirm('Close the event? Check-in ends and payouts start. This cannot be undone.')">
+						<button class="btn coral" type="submit">Close &amp; pay out</button>
+					</form>
+				}
+				<a class="btn ghost" href={ templ.SafeURL("/e/" + v.Ev.ID + "/poster") }>Print the QR poster</a>
+				<a class="btn ghost" href={ templ.SafeURL("/e/" + v.Ev.ID) }>Guest page</a>
+			</div>
+			if v.Phase != event.PhaseClosed {
+				<details class="card">
+					<summary>Open the door on another phone</summary>
+					<div class="door-qr">
+						<div class="qr">
+							@templ.Raw(QRSVG(doorURL, "Door page QR code"))
+						</div>
+						<p class="fine">Scan with the door phone, sign in there, and it becomes a door: it makes its own key and you register it once. Every check-in it scans is signed by that key.</p>
+					</div>
+				</details>
+			}
+			<h2 class="label">Guest list</h2>
+			if len(v.Guests) == 0 {
+				<p class="empty-inline">No RSVPs yet. Share the guest page or print the poster.</p>
+			} else {
+				<div class="table-wrap">
+					<table class="guests">
+						<thead><tr><th scope="col">Guest</th><th scope="col">Paid with</th><th scope="col">Code</th><th scope="col">Status</th></tr></thead>
+						<tbody>
+							for _, g := range v.Guests {
+								<tr>
+									<td><span class="face sm">{ event.Initials(g.Name) }</span>{ g.Name }</td>
+									<td>{ originLabel(g.Origin) }</td>
+									<td><code>{ g.Ticket[:3] + "-" + g.Ticket[3:6] }</code></td>
+									<td><span class={ payClass(rsvpFor(v, g.Ticket)) }>{ payLabel(rsvpFor(v, g.Ticket)) }</span></td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+			<h2 class="label">The DAO</h2>
+			<div class="card">
+				<dl class="kv">
+					<dt>DAO</dt><dd><code>{ v.Ev.DAO }</code></dd>
+					<dt>Holds</dt><dd>{ usdcx(v.Treasury.Balance) } USDC</dd>
+					<dt>Payout proposals</dt><dd>{ itoa(len(v.Treasury.Proposals)) }</dd>
+				</dl>
+				if len(v.Treasury.Proposals) > 0 {
+					<ol class="props">
+						for _, p := range v.Treasury.Proposals {
+							<li><code>#{ u64(p.ID) }</code> Transfer { usdcx(p.Amount) } USDC → <code>{ short(p.Receiver) }</code> <span class="st st-in">{ p.Status }</span></li>
+						}
+					</ol>
+				}
+			</div>
+		</section>
+	}
+}

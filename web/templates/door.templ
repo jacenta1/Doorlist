@@ -1,0 +1,125 @@
+package templates
+
+import "doorlist/internal/event"
+
+templ DoorPage(site Site, v *event.View, registered []string) {
+	@Bare(site, "Door · "+v.Meta.Title) {
+		<div class="door" id="door" data-event={ v.Ev.ID } data-demo={ boolStr(site.Demo) } data-keys={ joinKeys(registered) } data-contract={ site.Contract } data-network={ site.Network }>
+			<header class="door-top">
+				<a href={ templ.SafeURL("/host/e/" + v.Ev.ID) } class="mark sm">DOORLIST</a>
+				<span class="door-count" id="count"><b>{ itoa(v.Shows) }</b> / { itoa(v.Going) } in</span>
+			</header>
+			<p class="door-title">{ v.Meta.Title }</p>
+			<div class="viewfinder" id="vf">
+				<video id="cam" playsinline muted></video>
+				<canvas id="frame" hidden></canvas>
+				<div class="corners" aria-hidden="true"></div>
+				<div class="door-msg" id="setup" role="status">
+					<p class="display sm">Getting the door ready</p>
+					<p class="fine">Making this phone's door key…</p>
+				</div>
+			</div>
+			<div id="result" class="result" aria-live="assertive"></div>
+			<form id="manual" class="manual" autocomplete="off">
+				<label for="code">Camera trouble? Type the code</label>
+				<div class="manual-row">
+					<input id="code" name="code" placeholder="ABC-DEF" maxlength="8" autocapitalize="characters"/>
+					<button class="btn" type="submit">Check in</button>
+				</div>
+			</form>
+			<p class="fine door-key" id="keyline"></p>
+		</div>
+		<script src="/static/door.js" defer></script>
+	}
+}
+
+templ DoorResult(r event.DoorResult) {
+	if r.OK {
+		<div class="hit ok" data-shows={ itoa(r.Shows) } data-going={ itoa(r.Going) }>
+			<p class="display xl">In.</p>
+			<p class="who">{ r.Name }</p>
+			<p class="fine">{ r.Message } { itoa(r.Shows) } of { itoa(r.Going) } here.</p>
+		</div>
+	} else if r.Name == "" {
+		<div class="hit no" data-shows={ itoa(r.Shows) } data-going={ itoa(r.Going) }>
+			<p class="display lg">Not on the list.</p>
+			<p class="fine">{ r.Message }</p>
+		</div>
+	} else {
+		<div class="hit meh" data-shows={ itoa(r.Shows) } data-going={ itoa(r.Going) }>
+			<p class="display lg">{ r.Message }</p>
+			<p class="who">{ r.Name }</p>
+		</div>
+	}
+}
+
+templ Poster(site Site, v *event.View, url string) {
+	@Bare(site, "Poster · "+v.Meta.Title) {
+		<div class="poster-tools noprint">
+			<a href={ templ.SafeURL("/host/e/" + v.Ev.ID) } class="back">← Back</a>
+			<button class="btn" onclick="window.print()">Print</button>
+		</div>
+		<article class="poster">
+			<p class="poster-kicker">{ longDate(v.Starts) } · { clock(v.Starts) } · { v.Meta.Venue }, { v.Meta.City }</p>
+			<h1>{ v.Meta.Title }</h1>
+			<div class="poster-grid">
+				<div class="poster-qr">
+					@templ.Raw(QRSVG(url, "RSVP QR code"))
+				</div>
+				<div>
+					<p class="poster-big">Scan to RSVP</p>
+					<ol>
+						<li>Deposit { usdc(v.Ev.Deposit) } USDC from any chain. No NEAR wallet needed.</li>
+						<li>Show your ticket at the door.</li>
+						<li>Get it back, plus a share of every deposit from people who didn't come.</li>
+					</ol>
+					<p class="poster-url">{ url }</p>
+				</div>
+			</div>
+			<p class="poster-foot">DOORLIST · the pot sits in a Sputnik DAO on NEAR</p>
+		</article>
+	}
+}
+
+templ Kit(site Site) {
+	@Page(site, "Host kit · Doorlist", "Run Doorlist at a real meetup") {
+		<section class="narrow kit">
+			<h1 class="display md">Run it at a real meetup.</h1>
+			<p class="lede sm">Everything a host needs, in the order you need it.</p>
+			<h2 class="label">A week before</h2>
+			<ol class="check">
+				<li>Create a Sputnik DAO for your community with the hosts as council. Add the Doorlist contract as the only member of a <code>doorlist</code> role that may add and approve Transfer proposals. <code>scripts/create-dao.sh</code> does this.</li>
+				<li>Register the DAO with the USDC contract (<code>storage_deposit</code>) so it can hold USDC.</li>
+				<li>Create the event: deposit (5 to 10 USDC works), capacity, check-in window, regulars' head start.</li>
+				<li>Share the guest page link. Print the poster for the venue.</li>
+			</ol>
+			<h2 class="label">On the night</h2>
+			<ol class="check">
+				<li>Charge the door phone. Open the door scanner, sign in, register the phone as a door (one wallet signature).</li>
+				<li>Put the poster at the entrance for walk-ins who haven't RSVP'd.</li>
+				<li>Scan every ticket. If a camera fails, type the six-letter code.</li>
+				<li>A friend's ticket on someone else's phone still counts. The ticket is the bearer.</li>
+			</ol>
+			<h2 class="label">After</h2>
+			<ol class="check">
+				<li>Close the event. Payouts file one DAO proposal per guest and approve them automatically.</li>
+				<li>Check the DAO page: every payout is a Transfer proposal anyone can audit.</li>
+				<li>Post the headline: N RSVPs, M showed, X USDC moved from no-shows to the people who came.</li>
+			</ol>
+			<h2 class="label">Say this at the door</h2>
+			<p class="quote-line">"Your deposit is already marked for refund. If people flake tonight, you get their share."</p>
+		</section>
+	}
+}
+
+templ Message(site Site, title string, body string, linkHref string, linkText string) {
+	@Page(site, title+" · Doorlist", title) {
+		<section class="narrow empty">
+			<h1 class="display md">{ title }</h1>
+			<p class="lede sm">{ body }</p>
+			if linkHref != "" {
+				<a class="btn" href={ templ.SafeURL(linkHref) }>{ linkText }</a>
+			}
+		</section>
+	}
+}

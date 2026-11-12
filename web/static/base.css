@@ -1,0 +1,50 @@
+/* base.css: a classless base. Styles plain elements only; doorlist.css adds the rest. */
+:root {
+  --bg: #141414;
+  --fg: #ffffff;
+  --t80: rgba(255, 255, 255, .80);
+  --t64: rgba(255, 255, 255, .64);
+  --t50: rgba(255, 255, 255, .56); /* 56% keeps small text above 4.5:1 on #141414 */
+  --card: rgba(255, 255, 255, .08);
+  --line: rgba(255, 255, 255, .12);
+  --coral: #FF5C39;
+  --ui: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Anton", Impact, "Arial Narrow", sans-serif;
+  --r: 12px;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 400 16px/1.55 var(--ui); font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { line-height: 1.15; margin: 0 0 .5em; font-weight: 700; letter-spacing: -.01em; }
+p { margin: 0 0 1em; color: var(--t80); }
+a { color: var(--fg); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--coral); }
+small { font-size: .82em; color: var(--t64); }
+code { font: 500 .88em/1.4 ui-monospace, "SF Mono", Menlo, monospace; color: var(--t80); word-break: break-all; }
+img, svg, video { max-width: 100%; display: block; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; border-radius: 4px; }
+
+label { display: block; font-weight: 600; font-size: .94rem; margin: 1.1rem 0 .4rem; }
+label small { display: block; font-weight: 400; margin-top: .15rem; }
+input, textarea, select {
+  width: 100%; font: inherit; color: var(--fg); background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--line); border-radius: 10px; padding: .8rem .9rem; margin-top: .4rem;
+}
+input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, .42); }
+input:focus, textarea:focus { outline: none; border-color: var(--coral); }
+fieldset { border: 0; padding: 0; margin: 1.1rem 0 0; }
+legend { font-weight: 600; font-size: .94rem; margin-bottom: .5rem; padding: 0; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .7rem .5rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--t64); font-weight: 600; }
+dl { margin: 0; }
+details summary { cursor: pointer; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
