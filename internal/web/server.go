@@ -87,6 +87,8 @@ func (s *Server) Handler() http.Handler {
 	m.HandleFunc("GET /api/events", s.apiEvents)
 	m.HandleFunc("GET /api/events/{id}", s.apiEvent)
 	m.HandleFunc("GET /api/tickets/{id}/{ticket}", s.apiTicket)
+	m.HandleFunc("POST /api/events/{id}/rsvp", s.apiRSVP)
+	m.HandleFunc("GET /api/aura/{guest}", s.apiAura)
 
 	m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
@@ -607,4 +609,39 @@ func (s *Server) apiTicket(w http.ResponseWriter, r *http.Request) {
 		out["payout_usdc"] = pot.USDC(t.RSVP.Payout)
 	}
 	writeJSON(w, 200, out)
+}
+
+// apiRSVP starts an RSVP: JSON {"name","origin","address"} in, quote and ticket link out.
+func (s *Server) apiRSVP(w http.ResponseWriter, r *http.Request) {
+	var in event.RSVPInput
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4<<10)).Decode(&struct {
+		Name    *string `json:"name"`
+		Origin  *string `json:"origin"`
+		Address *string `json:"address"`
+	}{&in.Name, &in.Origin, &in.Address}); err != nil {
+		writeJSON(w, 400, map[string]string{"error": "bad json"})
+		return
+	}
+	in.Event = r.PathValue("id")
+	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
+	defer cancel()
+	g, err := s.Svc.StartRSVP(ctx, in)
+	if err != nil {
+		writeJSON(w, 422, map[string]string{"error": friendly(err)})
+		return
+	}
+	out := map[string]any{"ticket": g.Ticket, "ticket_url": s.Svc.BaseURL + "/t/" + g.Event + "/" + g.Ticket, "status": g.Status}
+	if g.Quote != nil {
+		out["send"] = g.Quote.Quote.AmountInFormatted + " " + g.Origin
+		out["deposit_address"] = g.Quote.Quote.DepositAddress
+		out["dry_run"] = g.Quote.QuoteRequest.Dry
+		out["offline_estimate"] = g.Quote.Offline
+	}
+	writeJSON(w, 200, out)
+}
+
+// apiAura recomputes a guest's attendance from the RSVP history and compares
+// it with the counter the ledger keeps.
+func (s *Server) apiAura(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, 200, s.Svc.Aura(r.PathValue("guest")))
 }

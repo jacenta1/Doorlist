@@ -561,3 +561,46 @@ func (s *Service) PendingDeposits() []*Guest {
 	}
 	return out
 }
+
+// Aura is a guest's attendance record, recomputed from the ledger's RSVP
+// history rather than trusted from a counter.
+type Aura struct {
+	Guest      string   `json:"guest"`
+	RSVPs      int      `json:"rsvps"`
+	Shows      int      `json:"shows"`
+	NoShows    int      `json:"no_shows"`
+	Events     []string `json:"events_attended"`
+	LedgerSays uint32   `json:"ledger_counter"`
+	Matches    bool     `json:"matches_ledger"`
+}
+
+// Aura walks every event's RSVPs. Anyone can do the same against the
+// contract with list_rsvps; get_shows must give the same number.
+func (s *Service) Aura(guest string) Aura {
+	a := Aura{Guest: guest, Events: []string{}}
+	s.mu.RLock()
+	ids := append([]string(nil), s.order...)
+	s.mu.RUnlock()
+	for _, id := range ids {
+		ev, err := s.Chain.Event(id)
+		if err != nil {
+			continue
+		}
+		rs, _ := s.Chain.RSVPs(id)
+		for _, r := range rs {
+			if r.Guest != guest {
+				continue
+			}
+			a.RSVPs++
+			if r.CheckedInAt != 0 {
+				a.Shows++
+				a.Events = append(a.Events, id)
+			} else if ev.Status == core.StatusClosed {
+				a.NoShows++
+			}
+		}
+	}
+	a.LedgerSays = s.Chain.Shows(guest)
+	a.Matches = int(a.LedgerSays) == a.Shows
+	return a
+}

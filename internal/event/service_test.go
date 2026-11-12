@@ -162,3 +162,15 @@ func TestCreateEvent(t *testing.T) {
 		t.Fatal("zero deposit accepted")
 	}
 }
+
+func TestAuraRecomputesFromHistory(t *testing.T) {
+	s, _, _, _ := demo(t)
+	a := s.Aura(DemoRegular)
+	if a.Shows != 2 || !a.Matches || a.RSVPs != 2 {
+		t.Fatalf("%+v", a)
+	}
+	f := s.Aura("base:0x00000000000000000000000000000000000d3e70")
+	if f.Shows != 0 || f.NoShows != 1 || !f.Matches {
+		t.Fatalf("%+v", f)
+	}
+}
