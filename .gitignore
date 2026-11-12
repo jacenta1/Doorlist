@@ -4,3 +4,4 @@
 *.wasm
 contract/generated_build.go
 .DS_Store
+contract/rust/target/

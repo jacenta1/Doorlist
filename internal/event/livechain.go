@@ -156,7 +156,7 @@ func (c *LiveChain) Deposit(event, ticket, guest, payTo string, amount uint64) e
 }
 
 func (c *LiveChain) CheckIn(in core.CheckInInput) (*core.RSVP, error) {
-	out, err := c.call("check_in", in, "0", 30)
+	out, err := c.call("check_in", map[string]any{"input": in}, "0", 30)
 	if err != nil {
 		return nil, err
 	}
