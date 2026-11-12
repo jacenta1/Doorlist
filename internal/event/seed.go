@@ -59,7 +59,7 @@ func demoAddress(event string, i int) (origin, address, identity, payTo string) 
 		a := fmt.Sprintf("0x%x", h[:20])
 		return "usdc-arb", a, "arb:" + a, ""
 	default:
-		a := "So1" + base32.StdEncoding.EncodeToString(h[:20])[:38]
+		a := core.Base58Encode(h[:32])
 		return "usdc-sol", a, "sol:" + a, ""
 	}
 }
