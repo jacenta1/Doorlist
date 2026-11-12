@@ -1,0 +1,9 @@
+[
+  {"name": "everyone shows", "deposit": 10000000, "going": 20, "shows": 20, "payout_per_show": 10000000, "forfeit": 0, "dust": 0, "to_dao": 0},
+  {"name": "README example: 40 going, 31 show", "deposit": 10000000, "going": 40, "shows": 31, "payout_per_show": 12903225, "forfeit": 90000000, "dust": 25, "to_dao": 25},
+  {"name": "one flake, three show", "deposit": 5000000, "going": 4, "shows": 3, "payout_per_show": 6666666, "forfeit": 5000000, "dust": 2, "to_dao": 2},
+  {"name": "nobody shows", "deposit": 10000000, "going": 12, "shows": 0, "payout_per_show": 0, "forfeit": 120000000, "dust": 0, "to_dao": 120000000},
+  {"name": "single guest shows", "deposit": 1000000, "going": 1, "shows": 1, "payout_per_show": 1000000, "forfeit": 0, "dust": 0, "to_dao": 0},
+  {"name": "shows clamped to going", "deposit": 1000000, "going": 2, "shows": 5, "payout_per_show": 1000000, "forfeit": 0, "dust": 0, "to_dao": 0},
+  {"name": "empty event", "deposit": 10000000, "going": 0, "shows": 0, "payout_per_show": 0, "forfeit": 0, "dust": 0, "to_dao": 0}
+]

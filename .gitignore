@@ -1,0 +1,6 @@
+.env
+.tools/
+/doorlist
+*.wasm
+contract/generated_build.go
+.DS_Store

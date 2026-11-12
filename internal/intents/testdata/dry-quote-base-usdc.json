@@ -1,0 +1,33 @@
+{
+  "_note": "Recorded response of a real POST /v0/quote with dry:true on 2026-11-10 (Base USDC -> NEAR USDC, EXACT_OUTPUT 10 USDC). Used as a parser fixture only.",
+  "quote": {
+    "amountIn": "10107094",
+    "amountInFormatted": "10.107094",
+    "amountInUsd": "10.101848418214",
+    "minAmountIn": "10006023",
+    "amountOut": "10000000",
+    "amountOutFormatted": "10.0",
+    "amountOutUsd": "9.994810000000",
+    "minAmountOut": "10000000",
+    "timeEstimate": 35,
+    "refundFee": "2400",
+    "withdrawFee": "0"
+  },
+  "quoteRequest": {
+    "dry": true,
+    "swapType": "EXACT_OUTPUT",
+    "slippageTolerance": 100,
+    "originAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+    "depositType": "ORIGIN_CHAIN",
+    "destinationAsset": "nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    "amount": "10000000",
+    "refundTo": "0x1111111111111111111111111111111111111111",
+    "refundType": "ORIGIN_CHAIN",
+    "recipient": "near",
+    "recipientType": "DESTINATION_CHAIN",
+    "deadline": "2026-11-10T07:00:49.000Z"
+  },
+  "signature": "ed25519:36FS1cdx2eRDo5pj6GTdhCLHUyUgnBdb1KFq8aPR5dEocJqexjy9PnyeWdbe8UeaPUbPhuiZvPKNiVBKoGYKwwSP",
+  "timestamp": "2026-11-10T06:50:50.224Z",
+  "correlationId": "18f3c1ee-504d-45a5-8b96-03623f035901"
+}
