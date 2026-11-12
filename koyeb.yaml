@@ -1,0 +1,24 @@
+# Koyeb service definition. Deploy with:
+#   koyeb deploy . doorlist/web --archive-builder docker --ports 8080:http --routes /:8080 \
+#     --env DOORLIST_BASE_URL=https://<your-app>.koyeb.app --checks 8080:http:/healthz
+# or connect the repository in the Koyeb console and pick "Dockerfile".
+name: doorlist
+services:
+  - name: web
+    type: web
+    docker:
+      dockerfile: Dockerfile
+    instance_types: [free]
+    regions: [fra]
+    scaling: { min: 1, max: 1 }
+    ports:
+      - port: 8080
+        protocol: http
+    routes:
+      - path: /
+        port: 8080
+    health_checks:
+      - http: { port: 8080, path: /healthz }
+    env:
+      - { key: DOORLIST_MODE, value: demo }
+      - { key: DOORLIST_BASE_URL, value: "https://CHANGE-ME.koyeb.app" }
