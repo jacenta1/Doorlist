@@ -212,7 +212,7 @@ func pct(a, b int) int {
 }
 
 func ms(v uint64) time.Time { return time.UnixMilli(int64(v)) }
-func u64(v uint64) string    { return fmt.Sprint(v) }
+func u64(v uint64) string   { return fmt.Sprint(v) }
 
 func stageClass(t *event.TicketView, i int) string {
 	done := 0

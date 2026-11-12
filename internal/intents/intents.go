@@ -100,14 +100,14 @@ type QuoteRequest struct {
 
 // Quote is the quote part of the response.
 type Quote struct {
-	DepositAddress    string `json:"depositAddress,omitempty"`
-	AmountIn          string `json:"amountIn"`
-	AmountInFormatted string `json:"amountInFormatted"`
-	AmountInUSD       string `json:"amountInUsd"`
-	AmountOut         string `json:"amountOut"`
+	DepositAddress     string `json:"depositAddress,omitempty"`
+	AmountIn           string `json:"amountIn"`
+	AmountInFormatted  string `json:"amountInFormatted"`
+	AmountInUSD        string `json:"amountInUsd"`
+	AmountOut          string `json:"amountOut"`
 	AmountOutFormatted string `json:"amountOutFormatted"`
-	TimeEstimate      int    `json:"timeEstimate"`
-	Deadline          string `json:"deadline,omitempty"`
+	TimeEstimate       int    `json:"timeEstimate"`
+	Deadline           string `json:"deadline,omitempty"`
 }
 
 // QuoteResponse is the full response.

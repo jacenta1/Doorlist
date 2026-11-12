@@ -127,21 +127,21 @@ const (
 
 // View is an event as pages show it.
 type View struct {
-	Meta     *Meta
-	Ev       *core.Event
-	Phase    Phase
-	Starts   time.Time
-	Doors    time.Time
-	Closes   time.Time
-	Public   time.Time
-	Going    int
-	Shows    int
+	Meta      *Meta
+	Ev        *core.Event
+	Phase     Phase
+	Starts    time.Time
+	Doors     time.Time
+	Closes    time.Time
+	Public    time.Time
+	Going     int
+	Shows     int
 	SpotsLeft int
-	Guests   []*Guest // confirmed, in RSVP order
-	RSVPs    []core.RSVP
-	Split    core.SplitResult
-	Outlooks []pot.Outlook
-	Treasury Treasury
+	Guests    []*Guest // confirmed, in RSVP order
+	RSVPs     []core.RSVP
+	Split     core.SplitResult
+	Outlooks  []pot.Outlook
+	Treasury  Treasury
 }
 
 func ms(v uint64) time.Time { return time.UnixMilli(int64(v)) }
@@ -322,12 +322,12 @@ func (s *Service) Settle(ticket string) error {
 
 // TicketView is the guest's ticket page.
 type TicketView struct {
-	Event  *View
-	Guest  *Guest
-	RSVP   *core.RSVP // nil until the deposit is on chain
-	URL    string
-	Short  string
-	Shows  uint32
+	Event *View
+	Guest *Guest
+	RSVP  *core.RSVP // nil until the deposit is on chain
+	URL   string
+	Short string
+	Shows uint32
 }
 
 // Ticket loads a ticket.

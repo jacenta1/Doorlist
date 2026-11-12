@@ -88,7 +88,11 @@
     return { event: ev, ticket, at_ms: at, door_key: pubStr, signature: b58(sig) };
   }
 
-  let busy = false, last = "", lastAt = 0;
+  let busy = false, last = "", lastAt = 0, clearTimer;
+  new MutationObserver(() => {
+    clearTimeout(clearTimer);
+    if (result.innerHTML) clearTimer = setTimeout(() => { result.innerHTML = ""; }, 3500);
+  }).observe(result, { childList: true });
   async function checkIn(ticket) {
     if (busy || (ticket === last && Date.now() - lastAt < 4000)) return;
     busy = true; last = ticket; lastAt = Date.now();

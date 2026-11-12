@@ -9,12 +9,12 @@ package core
 //     stays in the DAO.
 //   - If nobody checked in, every deposit stays in the DAO.
 type SplitResult struct {
-	Pot          uint64 `json:"pot"`
-	Forfeit      uint64 `json:"forfeit"`
-	SharePerShow uint64 `json:"share_per_show"`
+	Pot           uint64 `json:"pot"`
+	Forfeit       uint64 `json:"forfeit"`
+	SharePerShow  uint64 `json:"share_per_show"`
 	PayoutPerShow uint64 `json:"payout_per_show"`
-	Dust         uint64 `json:"dust"`
-	ToDAO        uint64 `json:"to_dao"`
+	Dust          uint64 `json:"dust"`
+	ToDAO         uint64 `json:"to_dao"`
 }
 
 // Split computes the payout for going RSVPs of which shows checked in.

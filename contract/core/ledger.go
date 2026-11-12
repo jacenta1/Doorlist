@@ -40,10 +40,10 @@ func (l *Ledger) put(key string, v any) {
 	l.KV.Set(key, b)
 }
 
-func eventKey(id string) string               { return "e:" + id }
-func rsvpKey(ev, ticket string) string        { return "r:" + ev + ":" + ticket }
-func guestKey(ev, guest string) string        { return "g:" + ev + ":" + guest }
-func repKey(guest string) string              { return "rep:" + guest }
+func eventKey(id string) string        { return "e:" + id }
+func rsvpKey(ev, ticket string) string { return "r:" + ev + ":" + ticket }
+func guestKey(ev, guest string) string { return "g:" + ev + ":" + guest }
+func repKey(guest string) string       { return "rep:" + guest }
 
 // ---- config ----
 

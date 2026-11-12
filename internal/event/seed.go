@@ -73,10 +73,15 @@ func Seed(s *Service, c *SimChain) error {
 	door := DemoDoorKey()
 	doorPub := core.FormatEd25519Key(door.Public().(ed25519.PublicKey))
 	h := time.Hour
+	// at is a clock time some days from today, so seeded events land in the evening.
+	at := func(days, hour int) time.Time {
+		u := base.UTC()
+		return time.Date(u.Year(), u.Month(), u.Day()+days, hour, 0, 0, 0, time.UTC)
+	}
 
 	type guestSpec struct {
 		ticket, name, origin, address, identity, payTo string
-		show                                          bool
+		show                                           bool
 	}
 	run := func(m *Meta, deposit uint64, created, starts time.Time, capacity uint32, public time.Time, minShows uint32, guests []guestSpec, checkinAt time.Time, closeAt *time.Time) error {
 		var err error
@@ -165,7 +170,7 @@ func Seed(s *Service, c *SimChain) error {
 		Hosts: []Host{{"Lucía Paz", "lucia-paz.testnet"}, {"Diego Salas", "diego-salas.testnet"}},
 		Cover: Cover{Words: []string{"ZK", "READING", "CLUB"}, Palette: 2, Pattern: 1},
 	}
-	zkStart := base.Add(-7 * 24 * h).Add(19 * h).Add(-time.Duration(base.Hour()) * h)
+	zkStart := at(-7, 19)
 	zkGuests := guestsFor("ba", zk.ID, upTo(12), func(i int) bool { return i%5 != 3 })
 	zkGuests = append(zkGuests,
 		guestSpec{TicketShowedUp, "You (demo)", "near", DemoRegular, DemoRegular, DemoRegular, true},
@@ -223,7 +228,7 @@ func Seed(s *Service, c *SimChain) error {
 		Featured: true,
 		Cover:    Cover{Words: []string{"BUILDERS", "NIGHT"}, Palette: 0, Pattern: 2},
 	}
-	bnStart := base.Add(50 * h)
+	bnStart := at(2, 19)
 	if err := run(bn, 10_000_000, base.Add(-3*24*h), bnStart, 60, base.Add(-2*24*h), 1, guestsFor("lis", bn.ID, upTo(23), func(int) bool { return false }), bnStart, nil); err != nil {
 		return err
 	}
@@ -238,7 +243,7 @@ func Seed(s *Service, c *SimChain) error {
 		Hosts: []Host{{"Ines Duarte", "ines-duarte.testnet"}},
 		Cover: Cover{Words: []string{"FOUNDERS", "DINNER"}, Palette: 3, Pattern: 1},
 	}
-	fdStart := base.Add(6 * 24 * h)
+	fdStart := at(6, 20)
 	// Its first four seats went to Buenos Aires regulars who are travelling:
 	// they showed up to both reading club and tea.
 	return run(fd, 20_000_000, base.Add(-h), fdStart, 12, base.Add(47*h), 2, guestsFor("ba", fd.ID, []int{0, 1, 4, 5}, func(int) bool { return false }), fdStart, nil)

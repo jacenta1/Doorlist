@@ -140,11 +140,11 @@ func TestDepositRejections(t *testing.T) {
 	l, env := setup(t)
 	env.now = t0 + 25*hour
 	cases := []struct {
-		name           string
-		sender, guest  string
-		ticket         string
-		amount         uint64
-		want           error
+		name          string
+		sender, guest string
+		ticket        string
+		amount        uint64
+		want          error
 	}{
 		{"wrong amount", relayer, "ana.near", "AAAABBBB", 9_000_000, ErrWrongAmount},
 		{"bad ticket", relayer, "ana.near", "lowercase", 10_000_000, ErrBadInput},

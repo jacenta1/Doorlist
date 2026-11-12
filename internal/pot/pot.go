@@ -54,10 +54,10 @@ func ParseUSDC(s string) (uint64, bool) {
 
 // Outlook is what a guest sees before the event: "if 20% flake, you get +2.50".
 type Outlook struct {
-	FlakeRate  int    // percent
-	Shows      uint32 // expected shows
-	Bonus      uint64 // micro-USDC on top of the deposit
-	BonusText  string
+	FlakeRate int    // percent
+	Shows     uint32 // expected shows
+	Bonus     uint64 // micro-USDC on top of the deposit
+	BonusText string
 }
 
 // Projections returns outlooks for a few flake rates, given who is going now.
@@ -94,10 +94,10 @@ func Policy(council []string, doorlistContract string) map[string]any {
 				"vote_policy": map[string]any{"transfer": map[string]any{"weight_kind": "RoleWeight", "quorum": "0", "threshold": []int{1, 1}}},
 			},
 		},
-		"default_vote_policy":     half,
-		"proposal_bond":           "0",
-		"proposal_period":         "604800000000000",
-		"bounty_bond":             "100000000000000000000000",
+		"default_vote_policy":       half,
+		"proposal_bond":             "0",
+		"proposal_period":           "604800000000000",
+		"bounty_bond":               "100000000000000000000000",
 		"bounty_forgiveness_period": "86400000000000",
 	}
 }

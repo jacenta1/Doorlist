@@ -235,3 +235,5 @@ body.bare { min-height: 100svh; }
   .row { grid-template-columns: 84px 1fr; }
   .row-cover { width: 84px; height: 84px; }
 }
+.shout.display { font-size: clamp(2.3rem, 8.4vw, 4.1rem); }
+.door .result { position: fixed; left: 1rem; right: 1rem; bottom: max(1rem, env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto; z-index: 5; box-shadow: 0 20px 50px rgba(0, 0, 0, .6); border-radius: 18px; }

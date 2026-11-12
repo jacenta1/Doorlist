@@ -65,7 +65,7 @@ type Event struct {
 	Title            string   `json:"title"`
 	Deposit          uint64   `json:"deposit,string"` // micro-USDC (6 decimals)
 	StartsAtMs       uint64   `json:"starts_at_ms"`
-	DoorsOpenMs      uint64   `json:"doors_open_ms"`  // check-in allowed from here
+	DoorsOpenMs      uint64   `json:"doors_open_ms"` // check-in allowed from here
 	CheckinCloseMs   uint64   `json:"checkin_close_ms"`
 	PublicFromMs     uint64   `json:"public_from_ms"` // before this, only guests with enough shows can RSVP
 	PriorityMinShows uint32   `json:"priority_min_shows"`

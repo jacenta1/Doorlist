@@ -435,7 +435,9 @@ func (s *Server) hostCreate(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/host/e/"+v.Ev.ID, http.StatusSeeOther)
 }
 
-func urlq(s string) string { return strings.NewReplacer(" ", "+", "&", "%26", "#", "%23", "?", "%3F").Replace(s) }
+func urlq(s string) string {
+	return strings.NewReplacer(" ", "+", "&", "%26", "#", "%23", "?", "%3F").Replace(s)
+}
 
 func (s *Server) hostEvent(w http.ResponseWriter, r *http.Request) {
 	_, v, ok := s.requireHost(w, r)
