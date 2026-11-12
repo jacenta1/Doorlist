@@ -1,0 +1,42 @@
+package templates
+
+import "doorlist/internal/event"
+
+func refusedCount(as []event.Attempt) int {
+	n := 0
+	for _, a := range as {
+		if a.Refused {
+			n++
+		}
+	}
+	return n
+}
+
+templ BreakIt(site Site, as []event.Attempt) {
+	@Page(site, "Try to break it · Doorlist", "Attacks on the Doorlist ledger and what happened") {
+		<section class="wide">
+			<h1 class="display md">{ itoa(refusedCount(as)) } of { itoa(len(as)) } refused.</h1>
+			<p class="lede sm">Each row is an attack run just now, on page load, against a fresh copy of the ledger logic the contract uses: real ed25519 signatures, real entry points, no mocks. The same list runs in <code>go test ./...</code>, and the Rust contract repeats the door and payout attacks in <code>cargo test</code>.</p>
+			<div class="table-wrap">
+				<table class="guests">
+					<thead><tr><th scope="col">Attack</th><th scope="col">What was tried</th><th scope="col">Ledger said</th></tr></thead>
+					<tbody>
+						for _, a := range as {
+							<tr>
+								<td><b>{ a.Name }</b></td>
+								<td>{ a.What }</td>
+								<td>
+									if a.Refused {
+										<span class="st st-in">Refused</span> <small>{ a.Reason }</small>
+									} else {
+										<span class="st">Went through</span>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</section>
+	}
+}

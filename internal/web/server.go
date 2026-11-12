@@ -66,6 +66,10 @@ func (s *Server) Handler() http.Handler {
 	m.HandleFunc("GET /t/{id}/{ticket}/status", s.ticketStatus)
 	m.HandleFunc("GET /kit", func(w http.ResponseWriter, r *http.Request) { s.render(w, r, templates.Kit(s.site(r))) })
 
+	m.HandleFunc("GET /break", func(w http.ResponseWriter, r *http.Request) {
+		s.render(w, r, templates.BreakIt(s.site(r), event.TryToBreakIt()))
+	})
+
 	m.HandleFunc("GET /host", s.hostHome)
 	m.HandleFunc("POST /host/demo", s.hostDemo)
 	m.HandleFunc("POST /host/signin", s.hostSignIn)

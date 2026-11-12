@@ -2,11 +2,13 @@ module doorlist
 
 go 1.26.0
 
-require doorlist/contract v0.0.0
+require (
+	github.com/a-h/templ v0.3.1070
+	rsc.io/qr v0.2.0
+)
 
 require (
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
-	github.com/a-h/templ v0.3.1070 // indirect
 	github.com/andybalholm/brotli v1.2.6 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cli/browser v1.3.0 // indirect
@@ -20,9 +22,6 @@ require (
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/tools v0.51.0 // indirect
-	rsc.io/qr v0.2.0 // indirect
 )
-
-replace doorlist/contract => ./contract
 
 tool github.com/a-h/templ/cmd/templ

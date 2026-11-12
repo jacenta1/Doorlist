@@ -30,6 +30,7 @@ templ Page(site Site, title string, desc string) {
 				<a href="/" class="mark" aria-label="Doorlist home">DOORLIST</a>
 				<nav aria-label="Main">
 					<a href="/" aria-current?={ site.Path == "/" }>Events</a>
+					<a href="/break">Break it</a>
 					<a href="/kit">Host kit</a>
 					if site.Host != "" {
 						<a href="/host" class="pill">{ short(site.Host) }</a>
