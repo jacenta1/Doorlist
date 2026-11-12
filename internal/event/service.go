@@ -80,6 +80,10 @@ type Service struct {
 	// LiveQuotes: request real (dry:false) quotes with deposit addresses.
 	// Off in demo mode, where quotes are dry:true.
 	LiveQuotes bool
+	// QuoteRecipient overrides who the quote is priced to. 1Click rejects
+	// recipients that do not exist on mainnet, and the demo relayer is a
+	// made-up testnet name, so demo dry-run quotes are priced to "near".
+	QuoteRecipient string
 
 	metas  map[string]*Meta
 	order  []string
@@ -272,7 +276,11 @@ func (s *Service) StartRSVP(ctx context.Context, in RSVPInput) (*Guest, error) {
 	}
 	if in.Origin != "near" {
 		o, _ := intents.OriginByID(in.Origin)
-		req := intents.DepositRequest(o, ev.Deposit, g.Address, s.Chain.Config().Relayer, !s.LiveQuotes, s.Now())
+		recipient := s.Chain.Config().Relayer
+		if s.QuoteRecipient != "" {
+			recipient = s.QuoteRecipient
+		}
+		req := intents.DepositRequest(o, ev.Deposit, g.Address, recipient, !s.LiveQuotes, s.Now())
 		q, err := s.Quoter.Quote(ctx, req)
 		if err != nil {
 			return nil, err

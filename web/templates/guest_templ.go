@@ -369,7 +369,7 @@ func QuoteCard(site Site, v *event.View, g *event.Guest, ticketURL string) templ
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<p class=\"fine tag\">Dry-run quote (dry: true). In demo mode 1Click prices the swap but issues no deposit address.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<p class=\"fine tag\">Live price from 1Click as a dry run (dry: true): it prices the swap but issues no deposit address, and is priced to a placeholder recipient.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

@@ -60,7 +60,7 @@ templ QuoteCard(site Site, v *event.View, g *event.Guest, ticketURL string) {
 				<p class="card-h">to this deposit address</p>
 				<p class="addr"><code>{ g.Quote.Quote.DepositAddress }</code></p>
 			} else {
-				<p class="fine tag">Dry-run quote (dry: true). In demo mode 1Click prices the swap but issues no deposit address.</p>
+				<p class="fine tag">Live price from 1Click as a dry run (dry: true): it prices the swap but issues no deposit address, and is priced to a placeholder recipient.</p>
 			}
 			<dl class="kv">
 				<dt>Arrives as</dt><dd>{ usdc(v.Ev.Deposit) } USDC on NEAR</dd>

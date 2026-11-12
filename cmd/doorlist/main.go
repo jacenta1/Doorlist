@@ -61,6 +61,7 @@ func main() {
 	if demo {
 		chain := event.NewSimChain(event.DemoConfig, now)
 		svc = event.NewService(chain, quoter, now, base, true)
+		svc.QuoteRecipient = "near"
 		if err := event.Seed(svc, chain); err != nil {
 			log.Fatalf("seed: %v", err)
 		}

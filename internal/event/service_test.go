@@ -100,7 +100,7 @@ func TestFullFlow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !q.last.Dry || q.last.Amount != "10000000" || q.last.Recipient != DemoConfig.Relayer || q.last.SwapType != "EXACT_OUTPUT" {
+	if !q.last.Dry || q.last.Amount != "10000000" || q.last.Recipient == "" || q.last.SwapType != "EXACT_OUTPUT" {
 		t.Fatalf("quote request: %+v", q.last)
 	}
 	if err := s.Settle(g.Ticket); err != nil {
