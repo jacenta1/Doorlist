@@ -125,7 +125,7 @@ fn full_flow() {
     let flake = c.get_rsvp("night".into(), "AAAACCCC".into()).unwrap();
     assert_eq!(flake.pay_status, PAY_FORFEIT);
     ctx("anyone.testnet", at + H);
-    assert_eq!(c.payout_batch("night".into(), 10), 2);
+    assert_eq!(c.payout_batch("night".into(), 10), 2, "capped at 2 per call");
     assert_eq!(c.payout_batch("night".into(), 10), 0, "nothing proposed twice");
     ctx("doorlist.testnet", at + H);
     c.on_payout_proposed("night".into(), "AAAABBBB".into(), Ok(41));

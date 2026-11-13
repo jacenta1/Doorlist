@@ -14,7 +14,7 @@ import (
 func TestTransactionLayout(t *testing.T) {
 	priv := ed25519.NewKeyFromSeed(make([]byte, 32))
 	tx := &Transaction{SignerID: "a.near", PublicKey: priv.Public().(ed25519.PublicKey), Nonce: 7, ReceiverID: "b.near",
-		Actions: []FunctionCall{{Method: "m", Args: []byte("{}"), Gas: 5, Deposit: big.NewInt(1)}}}
+		Actions: []Action{FunctionCall{Method: "m", Args: []byte("{}"), Gas: 5, Deposit: big.NewInt(1)}}}
 	b := tx.Serialize()
 	// signer: u32 len + "a.near"
 	if binary.LittleEndian.Uint32(b) != 6 || string(b[4:10]) != "a.near" || b[10] != 0 {

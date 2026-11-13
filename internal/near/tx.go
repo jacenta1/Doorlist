@@ -15,7 +15,34 @@ import (
 	"doorlist/contract/core"
 )
 
-// FunctionCall is the only action the relayer sends.
+// Action is one NEAR transaction action.
+type Action interface{ encode(b *borsh) }
+
+// CreateAccount creates the receiver account (a sub-account of the signer).
+type CreateAccount struct{}
+
+// DeployContract deploys code to the receiver.
+type DeployContract struct{ Code []byte }
+
+// Transfer sends yoctoNEAR to the receiver.
+type Transfer struct{ Deposit *big.Int }
+
+// AddFullAccessKey adds a full-access key to the receiver.
+type AddFullAccessKey struct{ PublicKey ed25519.PublicKey }
+
+func (CreateAccount) encode(b *borsh)      { b.u8(0) }
+func (a DeployContract) encode(b *borsh)   { b.u8(1); b.vec(a.Code) }
+func (a Transfer) encode(b *borsh)         { b.u8(3); b.u128(a.Deposit) }
+func (a AddFullAccessKey) encode(b *borsh) { b.u8(5); b.u8(0); b.Write(a.PublicKey); b.u64(0); b.u8(1) }
+func (a FunctionCall) encode(b *borsh) {
+	b.u8(2)
+	b.str(a.Method)
+	b.vec(a.Args)
+	b.u64(a.Gas)
+	b.u128(a.Deposit)
+}
+
+// FunctionCall calls a contract method.
 type FunctionCall struct {
 	Method  string
 	Args    []byte
@@ -30,7 +57,7 @@ type Transaction struct {
 	Nonce      uint64
 	ReceiverID string
 	BlockHash  [32]byte
-	Actions    []FunctionCall
+	Actions    []Action
 }
 
 type borsh struct{ bytes.Buffer }
@@ -62,11 +89,7 @@ func (t *Transaction) Serialize() []byte {
 	b.Write(t.BlockHash[:])
 	b.u32(uint32(len(t.Actions)))
 	for _, a := range t.Actions {
-		b.u8(2) // Action::FunctionCall
-		b.str(a.Method)
-		b.vec(a.Args)
-		b.u64(a.Gas)
-		b.u128(a.Deposit)
+		a.encode(&b)
 	}
 	return b.Bytes()
 }

@@ -372,7 +372,9 @@ impl Doorlist {
     pub fn payout_batch(&mut self, event: String, limit: u32) -> u32 {
         let ev = self.events.get(&event).cloned().unwrap_or_else(|| env::panic_str(ERR_NOT_FOUND));
         require!(ev.status != STATUS_OPEN, ERR_TOO_EARLY);
-        let limit = if limit == 0 || limit > 10 { 10 } else { limit };
+        // Each payout needs about 115 Tgas (proposal, approval, transfer, callbacks),
+        // so two fit in one 300 Tgas call.
+        let limit = if limit == 0 || limit > 2 { 2 } else { limit };
         let bond = NearToken::from_yoctonear(ev.dao_bond.parse::<u128>().unwrap_or(0));
         let mut n = 0u32;
         for t in ev.tickets.iter() {
@@ -389,10 +391,10 @@ impl Doorlist {
             self.rsvps.insert(k, r);
             let args = json!({"proposal": {"description": format!("Doorlist payout · {event} · ticket {t}"), "kind": kind}});
             Promise::new(ev.dao.clone())
-                .function_call("add_proposal".to_string(), args.to_string().into_bytes(), bond, Gas::from_tgas(20))
+                .function_call("add_proposal".to_string(), args.to_string().into_bytes(), bond, Gas::from_tgas(25))
                 .then(
                     Self::ext(env::current_account_id())
-                        .with_static_gas(Gas::from_tgas(45))
+                        .with_static_gas(Gas::from_tgas(80))
                         .on_payout_proposed(event.clone(), t.clone()),
                 )
                 .detach();
@@ -418,7 +420,7 @@ impl Doorlist {
         self.rsvps.insert(k, r);
         let args = json!({"id": id, "action": "VoteApprove", "proposal": kind, "memo": null});
         Promise::new(ev.dao)
-            .function_call("act_proposal".to_string(), args.to_string().into_bytes(), NearToken::from_yoctonear(0), Gas::from_tgas(25))
+            .function_call("act_proposal".to_string(), args.to_string().into_bytes(), NearToken::from_yoctonear(0), Gas::from_tgas(50))
             .then(
                 Self::ext(env::current_account_id())
                     .with_static_gas(Gas::from_tgas(8))

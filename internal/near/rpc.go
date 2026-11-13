@@ -130,13 +130,24 @@ type Signer struct {
 
 // Outcome is the part of a transaction result the app reads.
 type Outcome struct {
-	Hash        string          `json:"hash"`
-	SuccessJSON json.RawMessage `json:"success_value"`
-	Failure     string          `json:"failure,omitempty"`
+	Hash            string          `json:"hash"`
+	SuccessJSON     json.RawMessage `json:"success_value"`
+	Failure         string          `json:"failure,omitempty"`
+	Logs            []string        `json:"logs,omitempty"`
+	ReceiptFailures []string        `json:"receipt_failures,omitempty"`
 }
 
 // Send signs and sends one transaction and waits for the final result.
 func (s *Signer) Send(ctx context.Context, receiver string, calls ...FunctionCall) (*Outcome, error) {
+	acts := make([]Action, len(calls))
+	for i, c := range calls {
+		acts[i] = c
+	}
+	return s.SendActions(ctx, receiver, acts...)
+}
+
+// SendActions signs and sends any actions and waits for the final result.
+func (s *Signer) SendActions(ctx context.Context, receiver string, actions ...Action) (*Outcome, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	pub := s.Key.Public().(ed25519.PublicKey)
@@ -152,9 +163,15 @@ func (s *Signer) Send(ctx context.Context, receiver string, calls ...FunctionCal
 		return nil, err
 	}
 	s.nonce++
-	tx := &Transaction{SignerID: s.Account, PublicKey: pub, Nonce: s.nonce, ReceiverID: receiver, BlockHash: bh, Actions: calls}
+	tx := &Transaction{SignerID: s.Account, PublicKey: pub, Nonce: s.nonce, ReceiverID: receiver, BlockHash: bh, Actions: actions}
 	signed, hash := tx.Sign(s.Key)
 	var res struct {
+		ReceiptsOutcome []struct {
+			Outcome struct {
+				Logs   []string        `json:"logs"`
+				Status json.RawMessage `json:"status"`
+			} `json:"outcome"`
+		} `json:"receipts_outcome"`
 		Status struct {
 			SuccessValue *string         `json:"SuccessValue"`
 			Failure      json.RawMessage `json:"Failure"`
@@ -167,6 +184,12 @@ func (s *Signer) Send(ctx context.Context, receiver string, calls ...FunctionCal
 	if err != nil {
 		s.nonce = 0 // re-read on next send
 		return out, err
+	}
+	for _, r := range res.ReceiptsOutcome {
+		out.Logs = append(out.Logs, r.Outcome.Logs...)
+		if bytes.Contains(r.Outcome.Status, []byte("Failure")) {
+			out.ReceiptFailures = append(out.ReceiptFailures, string(r.Outcome.Status))
+		}
 	}
 	if res.Status.Failure != nil {
 		out.Failure = string(res.Status.Failure)
