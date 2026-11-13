@@ -11,4 +11,4 @@ generate:       ## regenerate templ views after editing *.templ
 	go tool templ generate
 wasm:           ## build the deployable contract
 	cd contract/rust && cargo near build non-reproducible-wasm
-.PHONY: run test test-contract test-all generate wasm
+.PHONY: verify testnet-run run test test-contract test-all generate wasm

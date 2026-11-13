@@ -27,9 +27,10 @@ func NewRPC(url string) *RPC {
 }
 
 type rpcErr struct {
-	Name  string          `json:"name"`
-	Cause json.RawMessage `json:"cause"`
-	Data  json.RawMessage `json:"data"`
+	Message string          `json:"message"`
+	Name    string          `json:"name"`
+	Cause   json.RawMessage `json:"cause"`
+	Data    json.RawMessage `json:"data"`
 }
 
 // Call runs one JSON-RPC method.
@@ -53,7 +54,7 @@ func (r *RPC) Call(ctx context.Context, method string, params any, out any) erro
 		return err
 	}
 	if env.Error != nil {
-		return fmt.Errorf("near rpc %s: %s %s", method, env.Error.Name, string(env.Error.Cause)+string(env.Error.Data))
+		return fmt.Errorf("near rpc %s: %s %s %s", method, env.Error.Name, env.Error.Message, string(env.Error.Cause)+string(env.Error.Data))
 	}
 	if out != nil {
 		return json.Unmarshal(env.Result, out)

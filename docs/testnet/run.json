@@ -1,0 +1,206 @@
+{
+  "network": "testnet",
+  "contract": "dl.doorlist-hk1113.testnet",
+  "token": "usdc.fakes.testnet",
+  "dao": "doorlist-hk1113.sputnikv2.testnet",
+  "event": "testnet-night-1",
+  "guests": {
+    "ana.doorlist-hk1113.testnet": "YLWKFGTPZ5QDCFVV",
+    "bo.doorlist-hk1113.testnet": "ALDTCCJZJYWPAOB6",
+    "cy.doorlist-hk1113.testnet": "MPYSPPLOWTBFGYTM",
+    "di.doorlist-hk1113.testnet": "ZWF4FEDW7L25GGCV",
+    "eli.doorlist-hk1113.testnet": "UN2FPGX74WX2ZUQO"
+  },
+  "steps": [
+    {
+      "name": "create contract account",
+      "tx": "5fkC9isLdusi2KmqWPHRWpk7f9coubik1bdB9f9abahy",
+      "at": "2026-11-13T10:37:18Z"
+    },
+    {
+      "name": "create guest ana.doorlist-hk1113.testnet",
+      "tx": "AvNeHyYdUgW4uMnWpQ7pbjBVMdDExKwrR77ZCwDq7h7s",
+      "at": "2026-11-13T10:37:31Z"
+    },
+    {
+      "name": "create guest bo.doorlist-hk1113.testnet",
+      "tx": "6wkG4Mm9stdSeyC3hrbkyhrRNwZwquYxTYvrpyorSHhK",
+      "at": "2026-11-13T10:37:44Z"
+    },
+    {
+      "name": "create guest cy.doorlist-hk1113.testnet",
+      "tx": "7LPmWx4K8MYRmbaVcXBkqAHkVvr3rJyWjNaveBbrf8vH",
+      "at": "2026-11-13T10:37:58Z"
+    },
+    {
+      "name": "create guest di.doorlist-hk1113.testnet",
+      "tx": "348voScaTEvrWqxwvLPcU6EthbYbvTMHnzBbsoF3HCDe",
+      "at": "2026-11-13T10:38:11Z"
+    },
+    {
+      "name": "create guest eli.doorlist-hk1113.testnet",
+      "tx": "E2TNbC1ktcE8LcyvtzJZ92vWG77cmzYhkii3WH8MkZPa",
+      "at": "2026-11-13T10:38:23Z"
+    },
+    {
+      "name": "deploy + init contract",
+      "tx": "BGChKSUn41BG9iNd3T8dV7a9pT1QYTWizzkeX3F6t68q",
+      "at": "2026-11-13T10:38:40Z"
+    },
+    {
+      "name": "create Sputnik DAO",
+      "tx": "GQE3khgkn8jNXEnHFhToUm5yhTi4k3sLwuSqPiUDdGW6",
+      "at": "2026-11-13T10:41:27Z"
+    },
+    {
+      "name": "token storage dl.doorlist-hk1113.testnet",
+      "tx": "6xHNRrPGKdgG5g3dtjEh9YYP2r1vJMKNHG4SkuzaVMsQ",
+      "at": "2026-11-13T10:41:31Z"
+    },
+    {
+      "name": "token storage doorlist-hk1113.sputnikv2.testnet",
+      "tx": "CXjgdm34DyNM394TWC6CP4DFRwqdxhGVaKgsVJmn3n1F",
+      "at": "2026-11-13T10:41:35Z"
+    },
+    {
+      "name": "token storage ana.doorlist-hk1113.testnet",
+      "tx": "Byi4pjxQbCkqPknLjot5zwjHnaohGxA2mM8HjvJv4pA2",
+      "at": "2026-11-13T10:41:40Z"
+    },
+    {
+      "name": "token storage bo.doorlist-hk1113.testnet",
+      "tx": "39xvk1CpAG9FTMEmHUMDSxvE8iso1is55JxY5g6jpogR",
+      "at": "2026-11-13T10:41:45Z"
+    },
+    {
+      "name": "token storage cy.doorlist-hk1113.testnet",
+      "tx": "6xFwGE3v2RFTByvDyQBWwmcYX9TEapf2QHcYNfBdhr1h",
+      "at": "2026-11-13T10:41:49Z"
+    },
+    {
+      "name": "token storage di.doorlist-hk1113.testnet",
+      "tx": "DohKJYE3rx3drAYiXWwjDRYJLuBuF9SGXraQDRjiPZe7",
+      "at": "2026-11-13T10:41:54Z"
+    },
+    {
+      "name": "token storage eli.doorlist-hk1113.testnet",
+      "tx": "W3hb7Muqv24metTX3LGA3P5EvW8RaBNcpGjGCBSj9Kw",
+      "at": "2026-11-13T10:41:58Z"
+    },
+    {
+      "name": "mint 10 test-USDC to ana.doorlist-hk1113.testnet",
+      "tx": "6vsUbXBiGaNN5v6SnB3UFTSJ8Gc1RwN3pSnaj4Nuk1nb",
+      "at": "2026-11-13T10:42:02Z"
+    },
+    {
+      "name": "mint 10 test-USDC to bo.doorlist-hk1113.testnet",
+      "tx": "sTVQQPcvF7CXRisynx9Fxzv5NsvNTj1rMwqj78iVqoZ",
+      "at": "2026-11-13T10:42:06Z"
+    },
+    {
+      "name": "mint 10 test-USDC to cy.doorlist-hk1113.testnet",
+      "tx": "4SFx3eUitMKdpzdAeH9pFtYMQbsJ99o57peRB9MTDt2K",
+      "at": "2026-11-13T10:42:10Z"
+    },
+    {
+      "name": "mint 10 test-USDC to di.doorlist-hk1113.testnet",
+      "tx": "5Mr5Wd9j7HmAjmAGAk2rBYE251saE6HUE8LmJhj57nDM",
+      "at": "2026-11-13T10:42:15Z"
+    },
+    {
+      "name": "mint 10 test-USDC to eli.doorlist-hk1113.testnet",
+      "tx": "26SAURggirSS5Fiw3cJN67KUzZ3w1N2vufV1YmGt1D2m",
+      "at": "2026-11-13T10:42:19Z"
+    },
+    {
+      "name": "host creates event",
+      "tx": "2t7tg51c2nmikW3VMkwfYYYjLdVfAN7M92UKpMumeXon",
+      "at": "2026-11-13T10:42:24Z"
+    },
+    {
+      "name": "host registers door key",
+      "tx": "6GRxTcvs222kE4Amybvc5RHTydNFLMwnHitMSThsL5qQ",
+      "at": "2026-11-13T10:42:28Z"
+    },
+    {
+      "name": "gas top-up ana.doorlist-hk1113.testnet",
+      "tx": "BkqrggzN47T8REjaUR6C5K2RbmDbBKbsK7WawUUqG9ke",
+      "at": "2026-11-13T10:43:16Z"
+    },
+    {
+      "name": "gas top-up bo.doorlist-hk1113.testnet",
+      "tx": "E2NqWc8gyVfjo3eiJs3Uw4cxeXaYNU3bWe2z7xwLaNjr",
+      "at": "2026-11-13T10:43:21Z"
+    },
+    {
+      "name": "gas top-up cy.doorlist-hk1113.testnet",
+      "tx": "2stEdqhoQ32QCghNic13tSBp6DYCaN7rxZeMF9MsPA8H",
+      "at": "2026-11-13T10:43:25Z"
+    },
+    {
+      "name": "gas top-up di.doorlist-hk1113.testnet",
+      "tx": "43EyaU3rdMMWgC26vJZZwxnLY3Ln7rAnzod63zgSVftu",
+      "at": "2026-11-13T10:43:29Z"
+    },
+    {
+      "name": "gas top-up eli.doorlist-hk1113.testnet",
+      "tx": "EBLgCXhGLx66JM1dJ2RerUJAfJcWUpGtvQvfGmAoC9Q5",
+      "at": "2026-11-13T10:43:33Z"
+    },
+    {
+      "name": "RSVP ana.doorlist-hk1113.testnet",
+      "tx": "AXZkERXRJPbBxbu6Yg25ZDrRP3fyM6kJpcQerovXFfUf",
+      "at": "2026-11-13T10:43:38Z"
+    },
+    {
+      "name": "RSVP bo.doorlist-hk1113.testnet",
+      "tx": "C4MnrcDbwhFmrRT1orPJibzCDDYsy2wrtpXHeyRwp3ov",
+      "at": "2026-11-13T10:43:44Z"
+    },
+    {
+      "name": "RSVP cy.doorlist-hk1113.testnet",
+      "tx": "47z4QWCuyFUpCy8m6WyfXF9MQV3TCVDhaXFcMATLZqqZ",
+      "at": "2026-11-13T10:43:50Z"
+    },
+    {
+      "name": "RSVP di.doorlist-hk1113.testnet",
+      "tx": "H1CeJgn6vzjBk4mPBvdDERM3HimrHdHUNW2GGTq9WE2r",
+      "at": "2026-11-13T10:43:55Z"
+    },
+    {
+      "name": "RSVP eli.doorlist-hk1113.testnet",
+      "tx": "Fd6gGGbsYbSXWhJ9WyJ6vFAE5sbt7jQxxHoM6HM9r8MW",
+      "at": "2026-11-13T10:44:01Z"
+    },
+    {
+      "name": "door checks in ana.doorlist-hk1113.testnet",
+      "tx": "FPn3E3EivSYfn5qVivCRYHnqEx7nHDMmQMgUUJqE4PBs",
+      "at": "2026-11-13T10:44:06Z"
+    },
+    {
+      "name": "door checks in bo.doorlist-hk1113.testnet",
+      "tx": "DTYjKVJgvUpogc36AWpfGm632GQuhWN2TP5YDg8dXHkG",
+      "at": "2026-11-13T10:44:10Z"
+    },
+    {
+      "name": "door checks in cy.doorlist-hk1113.testnet",
+      "tx": "d2cqrezKoo7aX5N3GV7mNGpfkkndX1cnBk2oMv6Ud6y",
+      "at": "2026-11-13T10:44:14Z"
+    },
+    {
+      "name": "host closes event",
+      "tx": "4F6JniVFBPPnFVQQEnFWBWpbbUPq2gEVJ5yLv6Y1THSS",
+      "at": "2026-11-13T10:44:18Z"
+    },
+    {
+      "name": "payout batch 1",
+      "tx": "9DRxBZDMMa9ziFi25MuhK6NQSjjKZ8QHZGPGcAACjJ6E",
+      "at": "2026-11-13T10:44:26Z"
+    },
+    {
+      "name": "payout batch 2",
+      "tx": "6SAyBoHucHWNDyuf3XWfRCM6Rvk8YCNtC5nuSnVEVxLt",
+      "at": "2026-11-13T10:44:33Z"
+    }
+  ]
+}

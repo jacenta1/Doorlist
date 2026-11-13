@@ -36,7 +36,7 @@ func main() {
 	mode := env("DOORLIST_MODE", "demo")
 	base := strings.TrimRight(env("DOORLIST_BASE_URL", "http://localhost:"+env("PORT", "8080")), "/")
 	network := env("NEAR_NETWORK", "testnet")
-	rpcURL := env("NEAR_RPC_URL", "https://rpc."+network+".near.org")
+	rpcURL := env("NEAR_RPC_URL", "https://rpc."+network+".fastnear.com")
 	contract := env("DOORLIST_CONTRACT", "")
 	loc, err := time.LoadLocation(env("DOORLIST_TZ", "UTC"))
 	if err != nil {
