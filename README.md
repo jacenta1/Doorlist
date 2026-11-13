@@ -7,6 +7,8 @@
 
 Built at NEAR HACKATHON, track **Social Money**.
 
+![The event page: cover art, date and place, and the deposit card](docs/screens/event.jpg)
+
 **The problem.** Free events fill up on paper and sit half empty on the night. Hosts over-invite to compensate, and the people who did come get a worse room. A deposit fixes that only if guests can pay it without friction (most don't hold NEAR) and if nobody has to trust the host with the money.
 
 ---
@@ -25,7 +27,7 @@ Built at NEAR HACKATHON, track **Social Money**.
 | `go test ./...` | 7 packages ok, 32 tests |
 | `cd contract/rust && cargo test` | 12 passed (the deployable contract) |
 
-Screenshots are in [`docs/screens/`](docs/screens). A narrated two-minute script is in [`docs/demo-script.md`](docs/demo-script.md).
+Screenshots (demo mode, seeded data) are in [`docs/screens/`](docs/screens): the event page on desktop and at 375 px, the paid ticket, the break-it page and the poster. A narrated two-minute script is in [`docs/demo-script.md`](docs/demo-script.md).
 
 ---
 
