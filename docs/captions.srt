@@ -1,0 +1,36 @@
+1
+00:00:00,500 --> 00:00:09,476
+Free events fill up on paper and sit half empty on the night. Doorlist fixes that with a smart RSVP deposit you get back when you attend.
+
+2
+00:00:10,500 --> 00:00:22,932
+RSVP with ten dollars. Show up and it comes back, plus an equal share of everyone who didn't. The deposit pool is held trustlessly in escrow, creating real incentives for people to show up.
+
+3
+00:00:25,500 --> 00:00:42,492
+Guests don't need a NEAR wallet or NEAR gas tokens. Pay from Base, Solana, or Bitcoin. NEAR Intents quotes the exact rate and settles it as USDC on NEAR. Here we select our chain, enter our address, and generate the instant deposit QR.
+
+4
+00:00:45,500 --> 00:00:54,787
+That generates your cryptographic ticket. The funds move through three visible stages: Deposited, Checked in, and Refunded plus share.
+
+5
+00:00:55,500 --> 00:01:10,284
+At the venue door, the host's phone scans your ticket. The scanner holds its own local key registered by the organizer and signs every check-in. The smart contract verifies that signature on chain in real time, preventing spoofing.
+
+6
+00:01:15,500 --> 00:01:30,403
+When the meetup ends, the host closes the event and the pot pays out automatically. The funds never sat in the host's personal wallet; they live inside a Sputnik DAO, where every distribution is executed as a verifiable on-chain proposal.
+
+7
+00:01:35,500 --> 00:01:43,587
+You showed up, so you get your ten dollars back plus your share of the no-shows. The attendee ticket updates immediately with the payout receipt.
+
+8
+00:01:45,500 --> 00:01:55,340
+We tested it against nineteen real attacks: fake check-ins, replay attempts, double refunds, and early closing. All nineteen are refused.
+
+9
+00:01:54,500 --> 00:01:59,563
+Doorlist. Built for the NEAR Hackathon. Bring it to your next meetup.
+
