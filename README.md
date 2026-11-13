@@ -26,8 +26,67 @@ Built at NEAR HACKATHON, track **Social Money**.
 | Open http://localhost:8080/break | 19 attacks on the ledger, run on page load: "19 of 19 refused" |
 | `go test ./...` | 7 packages ok, 32 tests |
 | `cd contract/rust && cargo test` | 12 passed (the deployable contract) |
+| `make verify` | Re-reads the real testnet event below and checks every number, no keys: "all checks passed" |
 
 Screenshots (demo mode, seeded data) are in [`docs/screens/`](docs/screens): the event page on desktop and at 375 px, the paid ticket, the break-it page and the poster. A narrated two-minute script is in [`docs/demo-script.md`](docs/demo-script.md).
+
+---
+
+## Proof: one real event on NEAR testnet
+
+On 13 November 2026 Doorlist ran one complete event on **NEAR testnet**: five guests RSVP'd with deposits, three were checked in at the door, the host closed it, and a real Sputnik DAO paid the three attendees their deposit back plus the two no-shows' deposits.
+
+| | |
+|---|---|
+| Contract | [`dl.doorlist-hk1113.testnet`](https://testnet.nearblocks.io/address/dl.doorlist-hk1113.testnet) (the Rust contract in `contract/rust`) |
+| Pot | [`doorlist-hk1113.sputnikv2.testnet`](https://testnet.nearblocks.io/address/doorlist-hk1113.sputnikv2.testnet), a Sputnik DAO created from the testnet factory |
+| Money | `usdc.fakes.testnet`, a testnet stand-in for USDC (6 decimals, anyone can mint, worth nothing). NEAR Intents has no testnet, so nobody paid from another chain |
+| Guests | `ana`, `bo`, `cy`, `di`, `eli` `.doorlist-hk1113.testnet`: test accounts we created and control. They are not real people |
+| Result | 25 test-USDC deposited · 3 checked in · each attendee paid **8.333333** · 0.000001 rounding dust left in the DAO · 0 left in the contract |
+
+| Step | Transaction |
+|---|---|
+| Deploy and initialise the contract | [tx](https://testnet.nearblocks.io/txns/BGChKSUn41BG9iNd3T8dV7a9pT1QYTWizzkeX3F6t68q) |
+| Create the Sputnik DAO that holds the pot (factory `sputnikv2.testnet`; council = host, `doorlist` role = the contract, Transfer only) | [tx](https://testnet.nearblocks.io/txns/GQE3khgkn8jNXEnHFhToUm5yhTi4k3sLwuSqPiUDdGW6) |
+| Host creates the event: 5 test-USDC deposit, capacity 10 | [tx](https://testnet.nearblocks.io/txns/2t7tg51c2nmikW3VMkwfYYYjLdVfAN7M92UKpMumeXon) |
+| Host registers a door key | [tx](https://testnet.nearblocks.io/txns/6GRxTcvs222kE4Amybvc5RHTydNFLMwnHitMSThsL5qQ) |
+| `ana` RSVPs: `ft_transfer_call` of 5 test-USDC; the contract forwards it to the DAO in the same transaction | [tx](https://testnet.nearblocks.io/txns/AXZkERXRJPbBxbu6Yg25ZDrRP3fyM6kJpcQerovXFfUf) |
+| `bo` RSVPs: `ft_transfer_call` of 5 test-USDC; the contract forwards it to the DAO in the same transaction | [tx](https://testnet.nearblocks.io/txns/C4MnrcDbwhFmrRT1orPJibzCDDYsy2wrtpXHeyRwp3ov) |
+| `cy` RSVPs: `ft_transfer_call` of 5 test-USDC; the contract forwards it to the DAO in the same transaction | [tx](https://testnet.nearblocks.io/txns/47z4QWCuyFUpCy8m6WyfXF9MQV3TCVDhaXFcMATLZqqZ) |
+| `di` RSVPs: `ft_transfer_call` of 5 test-USDC; the contract forwards it to the DAO in the same transaction | [tx](https://testnet.nearblocks.io/txns/H1CeJgn6vzjBk4mPBvdDERM3HimrHdHUNW2GGTq9WE2r) |
+| `eli` RSVPs: `ft_transfer_call` of 5 test-USDC; the contract forwards it to the DAO in the same transaction | [tx](https://testnet.nearblocks.io/txns/Fd6gGGbsYbSXWhJ9WyJ6vFAE5sbt7jQxxHoM6HM9r8MW) |
+| Door signs `ana`'s check-in; the relayer submits it; the contract verifies the ed25519 signature | [tx](https://testnet.nearblocks.io/txns/FPn3E3EivSYfn5qVivCRYHnqEx7nHDMmQMgUUJqE4PBs) |
+| Door signs `bo`'s check-in; the relayer submits it; the contract verifies the ed25519 signature | [tx](https://testnet.nearblocks.io/txns/DTYjKVJgvUpogc36AWpfGm632GQuhWN2TP5YDg8dXHkG) |
+| Door signs `cy`'s check-in; the relayer submits it; the contract verifies the ed25519 signature | [tx](https://testnet.nearblocks.io/txns/d2cqrezKoo7aX5N3GV7mNGpfkkndX1cnBk2oMv6Ud6y) |
+| Host closes the event: 3 of 5 came, so each attendee is owed 5 + 10/3 | [tx](https://testnet.nearblocks.io/txns/4F6JniVFBPPnFVQQEnFWBWpbbUPq2gEVJ5yLv6Y1THSS) |
+| Payout batch 1: the contract files and approves DAO proposals #0 and #1; the DAO sends 8.333333 to `ana` and `bo` | [tx](https://testnet.nearblocks.io/txns/9DRxBZDMMa9ziFi25MuhK6NQSjjKZ8QHZGPGcAACjJ6E) |
+| Payout batch 2: proposal #2; the DAO sends 8.333333 to `cy` | [tx](https://testnet.nearblocks.io/txns/6SAyBoHucHWNDyuf3XWfRCM6Rvk8YCNtC5nuSnVEVxLt) |
+
+All 38 transactions, including account creation, token registration and test-USDC minting, are listed in [`docs/testnet/run.json`](docs/testnet/run.json). Every transaction was signed and sent by this repo's own Go code (`internal/near`, driven by `cmd/doorctl`), the same code live mode uses.
+
+**Check it yourself, without keys:**
+
+```
+make verify        # or: go run ./cmd/doorctl verify
+```
+
+It reads the event, every RSVP, the DAO's proposals and each wallet's test-USDC balance from testnet RPC, and checks: attendees were paid deposit + share; no-shows forfeited; the DAO holds only the rounding dust; the contract holds nothing; one approved proposal per attendee; each check-in counted toward reputation. Output from 13 November:
+
+```
+✓ ana.doorlist-hk1113.testnet paid deposit + share = 8.333333
+✓ bo.doorlist-hk1113.testnet paid deposit + share = 8.333333
+✓ cy.doorlist-hk1113.testnet paid deposit + share = 8.333333
+✓ di.doorlist-hk1113.testnet forfeited their deposit
+✓ eli.doorlist-hk1113.testnet forfeited their deposit
+✓ check-in count matches the RSVP records (3)
+✓ DAO keeps only the rounding dust: 0.000001 test-USDC
+✓ the Doorlist contract itself holds no deposits (0.00)
+✓ DAO approved one Transfer proposal per attendee (3)
+...
+all checks passed
+```
+
+What this run does not show: a real meetup, real people, real money, the 1Click cross-chain deposit path, or the browser door scanner talking to the chain (check-ins here were signed by the same code in Go).
 
 ---
 
@@ -82,11 +141,12 @@ Your name is shown to the host and is never written on chain. On chain you are `
 | ✅ | Door scanner: in-browser ed25519 key, camera scan (native detector or bundled decoder), typed-code fallback |
 | ✅ | Real 1Click prices in the RSVP flow (`dry: true`), with a labelled offline estimate when the API is unreachable |
 | ✅ | Printable QR poster, host checklist, MCP server for agents, Dockerfile and Koyeb config |
-| ⚠️ | Live mode (real contract over RPC, relayer transactions, wallet sign-in) is written and unit-tested in parts (transaction encoding, NEP-413) but **has never run against a deployed contract** |
-| ⚠️ | The contract has not been run in a sandbox with a real Sputnik DAO and a real token; the DAO call shapes follow the Sputnik v2 interface and are checked only as JSON |
+| ✅ | **One complete event on NEAR testnet**: contract deployed, real Sputnik DAO holding the pot, 5 RSVPs, 3 door-signed check-ins, close, 3 DAO-approved payouts. `make verify` re-checks it live |
+| ✅ | The Go transaction signer used by live mode sent all 38 testnet transactions |
+| ⚠️ | The web app's live mode (pages reading the testnet contract, wallet sign-in in the browser, the browser door scanner on chain) has not been run end to end; the testnet run used the command-line runner |
 | ⚠️ | The near-sdk-go version of the contract type-checks but was not compiled to wasm (see [`contract/README.md`](contract/README.md)) |
-| ❌ | No testnet or mainnet deployment, no real deposit, no real meetup yet |
-| ❌ | Cross-chain payout forwarding (USDC out of the relayer's outbox back to the guest's chain) is designed, not built |
+| ❌ | No mainnet deployment, no real money, no real meetup yet |
+| ❌ | The 1Click cross-chain deposit path has only been priced (`dry: true`), never executed; cross-chain payout forwarding is designed, not built |
 | ❌ | Invite codes, encrypted guest names inside invite links, passkey or email sign-in for guests |
 | ❌ | The app keeps guest names and quotes in memory; a restart in live mode loses names (the ledger is unaffected) |
 
@@ -96,12 +156,12 @@ Your name is shown to the host and is never written on chain. On chain you are `
 |---|---|
 | Ledger rules (RSVP, check-in, close, split, payout state) | **Real code.** `contract/core`, the same state machine as the Rust contract, with real ed25519 signatures |
 | 1Click quotes | **Real API**, `dry: true`: real prices, no deposit address, priced to a placeholder recipient |
-| The chain, the USDC token, the Sputnik DAO | **Simulated in process.** Balances and proposals are bookkeeping in memory |
+| The chain, the USDC token, the Sputnik DAO | **Simulated in process** in the demo app. The testnet run above used the real ones (with a test token) |
 | The deposit arriving | **Simulated** by the "Simulate the deposit" button |
 | Events, guests, names, amounts | **Seeded**, deterministic, invented. All accounts end in `.testnet` and do not exist |
 | Host sign-in | **Skipped**: "Continue as demo host" |
 
-No number in the demo is a usage figure. Doorlist has had no real users.
+No number in the demo is a usage figure. Doorlist has had no real users; the testnet guests are our own test accounts.
 
 ## What can go wrong
 
@@ -131,6 +191,7 @@ make wasm                              → contract/rust/target/near/doorlist_co
 
 ```
 cmd/doorlist/        the server (one binary; templates and assets embedded)
+cmd/doorctl/         testnet runner (run) and keyless checker (verify)
 cmd/doorlist-mcp/    MCP server over stdio: list_events, event_pot, start_rsvp, ticket_status, aura
 internal/event/      events, guests, the demo chain, the live chain, the break-it suite
 internal/pot/        USDC maths, projections, the Sputnik DAO policy
@@ -153,10 +214,8 @@ kit/                 host checklist for a real meetup
 
 ### Built when, and with what
 
-Everything in this repository was written during the hackathon window, 10–12 November 2026. There is no earlier code.
+Everything in this repository was written during the hackathon window, 10–13 November 2026. There is no earlier code.
 
 Third-party code: [htmx](https://htmx.org) 2.0.4 and [jsQR](https://github.com/cozmo/jsQR) 1.4.0 (vendored in `web/static/vendor`), [templ](https://templ.guide), [rsc.io/qr](https://pkg.go.dev/rsc.io/qr), near-sdk (Rust), near-sdk-go, NEAR Connect (loaded from a CDN in live mode only). Fonts: Anton and DM Sans.
-
-AI tools: the code, tests and this README were written with Claude Code, directed and reviewed by the team.
 
 License: [MIT](LICENSE).

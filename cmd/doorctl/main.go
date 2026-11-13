@@ -138,7 +138,9 @@ func signer(acc string) *near.Signer {
 
 // ---- chain helpers ----
 
-func ctx() (context.Context, context.CancelFunc) { return context.WithTimeout(context.Background(), 90*time.Second) }
+func ctx() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), 90*time.Second)
+}
 
 func exists(acc string) bool {
 	x, c := ctx()
