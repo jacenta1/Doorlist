@@ -234,7 +234,12 @@ func (s *Server) simulate(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = s.Svc.Settle(t)
 	url := "/t/" + g.Event + "/" + t
-	w.Header().Set("HX-Redirect", url)
+	if r.Header.Get("HX-Request") == "true" {
+		// A 303 would be followed inside the XHR and the page swapped into the form.
+		w.Header().Set("HX-Redirect", url)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 

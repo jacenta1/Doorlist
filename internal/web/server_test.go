@@ -92,8 +92,13 @@ func TestJourney(t *testing.T) {
 	if _, body := get(t, c, srv.URL+m[0]); !strings.Contains(body, "Waiting for your deposit.") {
 		t.Fatal("ticket should wait for deposit")
 	}
-	r, _ = c.PostForm(srv.URL+"/t/"+m[1]+"/simulate", nil)
+	hx, _ := http.NewRequest("POST", srv.URL+"/t/"+m[1]+"/simulate", nil)
+	hx.Header.Set("HX-Request", "true")
+	r, _ = c.Do(hx)
 	r.Body.Close()
+	if r.StatusCode != 204 || r.Header.Get("HX-Redirect") != m[0] {
+		t.Fatalf("htmx simulate must answer HX-Redirect, got %d %q", r.StatusCode, r.Header.Get("HX-Redirect"))
+	}
 	if _, body := get(t, c, srv.URL+m[0]); !strings.Contains(body, "on the list.") || !strings.Contains(body, "<svg") {
 		t.Fatal("ticket should show QR after deposit")
 	}
