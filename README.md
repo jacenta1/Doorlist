@@ -3,7 +3,7 @@
 **What:** RSVP to a meetup with a small deposit. Show up and get it back plus a share of the no-shows. Flake and your deposit goes to the people who came.
 **When:** whenever you run `go run ./cmd/doorlist`
 **Where:** http://localhost:8080 (no keys, no accounts, no wallet: it starts in a labelled demo mode)
-**Dress code:** Go 1.25+. Nothing else for the app. Rust only if you want to run the contract's own tests.
+**Dress code:** Go 1.25+. Nothing else for the app. Rust only if you want to run the contract's own tests. The first `go run` or `go test` on a fresh machine downloads Go modules and can take a few minutes on a slow connection; after that the tests finish in seconds.
 
 Built at NEAR HACKATHON, track **Social Money**.
 
@@ -17,7 +17,7 @@ Built at NEAR HACKATHON, track **Social Money**.
 
 | Do | See |
 |---|---|
-| `go run ./cmd/doorlist`, open http://localhost:8080 | Five seeded events: one settled, one with doors open now, two upcoming |
+| `go run ./cmd/doorlist`, open http://localhost:8080 | Five seeded events: one with doors open now, two upcoming (one of them regulars-first), two settled |
 | Open **Builders Night** → **Deposit & RSVP** → name, "USDC · Base", any `0x…` address → **Get my deposit address** | A live NEAR Intents 1Click quote (`dry: true`): the exact amount to send so that 10 USDC lands on NEAR |
 | **Simulate the deposit (demo)** | Your ticket: a QR code, a six-letter code, and the money stages (Deposited → Checked in → Refunded + share) |
 | **Host an event** → **Continue as demo host** → **Rooftop Demo Hour** → **Open the door scanner** | The phone makes its own ed25519 door key and scans tickets with the camera. No camera? Type `DOO-RDE`: "IN." |
